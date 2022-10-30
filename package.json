@@ -4,7 +4,9 @@
   "description": "",
   "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "webpack serve --open",
+    "build": "webpack"
   },
   "repository": {
     "type": "git",
@@ -20,7 +22,8 @@
   "devDependencies": {
     "ify-loader": "^1.1.0",
     "webpack": "^5.74.0",
-    "webpack-cli": "^4.10.0"
+    "webpack-cli": "^4.10.0",
+    "webpack-dev-server": "^4.11.1"
   },
   "dependencies": {
     "plotly.js-dist": "^2.16.1"
