@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/harrisonmg/jfplot#readme",
   "devDependencies": {
+    "copy-webpack-plugin": "^11.0.0",
     "ify-loader": "^1.1.0",
     "webpack": "^5.74.0",
     "webpack-cli": "^4.10.0",

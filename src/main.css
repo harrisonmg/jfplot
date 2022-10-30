@@ -1,0 +1,10 @@
+body {
+  background: var(--bg);
+  color: var(--fontColor);
+  font-family: monospace;
+}
+
+.dark-theme {
+  --bg: black;
+  --fontColor: green;
+}
