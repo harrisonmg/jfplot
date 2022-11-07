@@ -14,12 +14,19 @@
   <body class="dark-theme">
 
     <div id="plot" style="width:600px;height:250px;"></div>
-    <button id="btn">Button</button>
+
+    <button id="add-series-button">Add Series</button>
+
     <input type="file" id="file-input"/>
-    <div>
-      <h2>UPLOADED FILES</h2>
-      <ul id='file-list'></ul>
-    </div>
+
+    <template id="series-template">
+      <div class='series'>
+        <h2>Series</h2>
+        <select name="file" class="file-select"></select>
+        <select name="x" class="x-select"></select>
+        <select name="y" class="y-select"></select>
+      </div>
+    </template>
 
     <script src="main.js"></script>
     <noscript>Enable JavaScript in order for this website to work properly.</noscript>
