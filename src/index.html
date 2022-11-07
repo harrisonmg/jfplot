@@ -17,14 +17,14 @@
 
     <button id="add-series-button">Add Series</button>
 
-    <input type="file" id="file-input"/>
+    <input type="file" id="file-input" multiple/>
 
     <template id="series-template">
       <div class='series'>
         <h2>Series</h2>
         <select name="file" class="file-select"></select>
-        <select name="x" class="x-select"></select>
-        <select name="y" class="y-select"></select>
+        <select name="x" class="trace-select x-select"></select>
+        <select name="y" class="trace-select y-select"></select>
       </div>
     </template>
 
