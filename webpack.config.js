@@ -7,7 +7,7 @@ module.exports = {
     static: './dist',
     watchFiles: ["src/**/*"]
   },
-  entry: './src/main.js',
+  entry: './src/main.ts',
   module: {
     rules: [
       {
@@ -21,6 +21,11 @@ module.exports = {
       {
         test: /\.css/,
         type: 'asset/resource'
+      },
+      {
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/
       }
     ]
   },
