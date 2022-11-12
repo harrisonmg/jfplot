@@ -13,18 +13,29 @@
 
   <body class="dark-theme">
 
-    <div id="plot" style="width:600px;height:250px;"></div>
+    <div id="plot" style="width:800px;height:500px;"></div>
+
+    <!--<input type="file" id="file-input" multiple></input>-->
 
     <button id="add-series-button">Add Series</button>
-
-    <input type="file" id="file-input" multiple/>
+    <button class="remove-series-button">Remove Series</button>
 
     <template id="series-template">
       <div class='series'>
-        <h2>Series</h2>
-        <select name="file" class="file-select"></select>
-        <select name="x" class="trace-select x-select"></select>
-        <select name="y" class="trace-select y-select"></select>
+
+        <select class="file-select"></select>
+        <select class="trace-select x-select"></select>
+        <select class="trace-select y-select"></select>
+
+        <label>
+          <input type="checkbox" class="marker-checkbox scatter-checkbox" checked/>
+          Scatter
+        </label>
+
+        <label>
+          <input type="checkbox" class="marker-checkbox line-checkbox"/>
+          Line
+        </label>
       </div>
     </template>
 
