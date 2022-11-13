@@ -1,5 +1,3 @@
-* loading
-* plot width
-* style
 * secondary axis
 * subplots
+* better style

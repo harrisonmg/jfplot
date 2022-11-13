@@ -1,11 +1,12 @@
 'use strict';
 
 import * as Plotly from 'plotly.js-dist';
-import * as dfd from 'danfojs';
+import * as Papa from 'papaparse';
 
-type CSV = { [key: string]: any };
+type CSVObject = { [key: string]: any[] };
+type CSVRow = { [key: string]: any };
 
-const dfs: { [key: string]: CSV } = {};
+const dfs: { [key: string]: CSVObject } = {};
 
 let seriesCounter = 0;
 let firstFile = true;
@@ -68,9 +69,9 @@ const removeSeries = () => {
     document.querySelector('#series-' + seriesCounter).remove();
     Plotly.deleteTraces('plot', [-1]);
   }
-}
+};
 
-const updateSelect = (select: HTMLSelectElement, options: Array<string>) => {
+const updateSelect = (select: HTMLSelectElement, options: string[]) => {
   const selection = select.value;
 
   while (select.firstChild) {
@@ -133,7 +134,6 @@ const updateTrace = (series: HTMLElement, index: number) => {
       y: [dfs[file][y]]
     }
 
-    console.log(index);
     Plotly.restyle('plot', trace, index);
   }
 };
@@ -155,21 +155,41 @@ const updateMarkers = (series: HTMLElement, index: number) => {
   Plotly.restyle('plot', {mode: mode}, index);
 };
 
+const transpose = (result: Papa.ParseResult<CSVRow>): CSVObject => {
+ const ret: CSVObject = {};
+
+ for (const field of result.meta.fields) {
+   ret[field] = [];
+ }
+
+ for (const row of result.data) {
+   for (const field of Object.keys(row)) {
+     ret[field].push(row[field]);
+   }
+ }
+
+ return ret;
+};
+
 const addFile = (file: File) => {
   if (firstFile) {
     Plotly.relayout('plot', {title: traceInstruction})
   }
   firstFile = false;
 
-  const filename = file.name.split('\\').slice(-1)[0];
-  dfd.readCSV('./' + filename).then((df) => {
-    const dfJson = dfd.toJSON(df, { format: 'row' }) as CSV;
-    dfs[filename] = dfJson;
-    for (const series of document.querySelectorAll('.series') as NodeListOf<HTMLElement>) {
-      updateSeries(series);
+  Papa.parse(file, {
+    header: true,
+    dynamicTyping: true,
+    skipEmptyLines: 'greedy',
+    download: true,
+    complete: (result: Papa.ParseResult<CSVRow>) => {
+      dfs[file.name] = transpose(result);
+      for (const series of document.querySelectorAll('.series') as NodeListOf<HTMLElement>) {
+       updateSeries(series);
+      }
     }
-  })
-}
+  });
+};
 
 Plotly.newPlot('plot', [], default_layout, default_plot_options)
   .then((plot) => {
@@ -186,7 +206,6 @@ Plotly.newPlot('plot', [], default_layout, default_plot_options)
     });
     addSeries();
   });
-
 
 document.querySelector('#add-series-button')
  .addEventListener('click', () => {
@@ -212,3 +231,11 @@ window.addEventListener('drop', (event) => {
     }
   }
 }, false);
+
+const observer = new MutationObserver(() => {
+  window.dispatchEvent(new Event('resize'));
+});
+
+observer.observe(document.querySelector('#plot'), {attributes: true});
+
+(document.querySelector('#loading') as HTMLElement).style.display = 'none';

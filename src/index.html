@@ -11,14 +11,18 @@
 
   </head>
 
-  <body class="dark-theme">
+  <body>
 
-    <div id="plot" style="width:800px;height:500px;"></div>
+    <div id="loading">
+      <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+    </div>
 
-    <!--<input type="file" id="file-input" multiple></input>-->
+    <div id="plot"></div>
 
-    <button id="add-series-button">Add Series</button>
-    <button class="remove-series-button">Remove Series</button>
+    <div id="series-buttons">
+      <button id="add-series-button">Add Series</button>
+      <button class="remove-series-button">Remove Series</button>
+    </div>
 
     <template id="series-template">
       <div class='series'>
