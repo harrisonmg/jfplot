@@ -1,3 +1,2 @@
-* secondary axis
+* tips / bug report / feature request / made by
 * subplots
-* better style
