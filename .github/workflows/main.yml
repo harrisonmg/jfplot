@@ -18,6 +18,7 @@ jobs:
           npm ci
           mv node_modules/@types/plotly.js/ node_modules/@types/plotly.js-dist/
           npm run build
+          mv CNAME dist/
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4.4.1
