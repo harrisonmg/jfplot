@@ -27,9 +27,20 @@
     <template id="series-template">
       <div class='series'>
 
-        <select class="file-select"></select>
-        <select class="trace-select x-select"></select>
-        <select class="trace-select y-select"></select>
+        <label>
+          File
+          <select class="file-select"></select>
+        </label>
+
+        <label>
+          X
+          <select class="trace-select x-select"></select>
+        </label>
+
+        <label>
+          Y
+          <select class="trace-select y-select"></select>
+        </label>
 
         <label>
           <input type="checkbox" class="marker-checkbox scatter-checkbox" checked/>
@@ -39,6 +50,11 @@
         <label>
           <input type="checkbox" class="marker-checkbox line-checkbox"/>
           Line
+        </label>
+
+        <label>
+          <input type="checkbox" class="y2-checkbox"/>
+          Secondary Y Axis
         </label>
       </div>
     </template>

@@ -18,7 +18,12 @@ const traceInstruction = 'Select a file, x column and y column to plot a series.
 const default_layout: Partial<Plotly.Layout> = {
   title: fileInstruction,
   xaxis: { title: '' },
-  yaxis: { title: '' }
+  yaxis: { title: '' },
+  yaxis2: {
+    title: '',
+    overlaying: 'y',
+    side:'right'
+  }
 };
 
 const default_plot_options: Partial<Plotly.Config> = {
@@ -57,6 +62,11 @@ const addSeries = () =>
      updateMarkers(series, index);
    });
   }
+
+  series.querySelector('.y2-checkbox')
+    .addEventListener('click', () => {
+      updateAxis(series, index);
+    })
 
   updateSeries(series);
   document.querySelector('body').appendChild(seriesNode);
@@ -152,7 +162,19 @@ const updateMarkers = (series: HTMLElement, index: number) => {
   } else if (line) {
     mode = 'lines';
   }
+
   Plotly.restyle('plot', {mode: mode}, index);
+};
+
+const updateAxis = (series: HTMLElement, index: number) => {
+  const y2 = (series.querySelector('.y2-checkbox') as HTMLInputElement).checked;
+
+  let yaxis = '';
+  if (y2) {
+    yaxis = 'y2';
+  }
+
+  Plotly.restyle('plot', {yaxis: yaxis}, index);
 };
 
 const transpose = (result: Papa.ParseResult<CSVRow>): CSVObject => {
