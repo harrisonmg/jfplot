@@ -183,11 +183,16 @@ const addFile = (file: File) => {
     skipEmptyLines: 'greedy',
     download: true,
     complete: (result: Papa.ParseResult<CSVRow>) => {
-      dfs[file.name] = transpose(result);
-      for (const series of document.querySelectorAll('.series') as NodeListOf<HTMLElement>) {
-       updateSeries(series);
+      if (result.errors.length > 0) {
+        const error = JSON.stringify(result.errors[0], null, 4);
+        alert(`Failed to load file "${file.name}":\n${error}`);
+      } else {
+        dfs[file.name] = transpose(result);
+        for (const series of document.querySelectorAll('.series') as NodeListOf<HTMLElement>) {
+          updateSeries(series);
+        }
       }
-    }
+    },
   });
 };
 
