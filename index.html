@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>jfplot</title>
+    <link rel="stylesheet" href="main.css">
+
+  </head>
+
+  <body>
+
+    <div id="loading">
+      <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+    </div>
+
+    <div id="plot"></div>
+
+    <div id="series-buttons">
+      <button id="add-series-button">Add Series</button>
+      <button class="remove-series-button">Remove Series</button>
+    </div>
+
+    <template id="series-template">
+      <div class='series'>
+
+        <select class="file-select"></select>
+        <select class="trace-select x-select"></select>
+        <select class="trace-select y-select"></select>
+
+        <label>
+          <input type="checkbox" class="marker-checkbox scatter-checkbox" checked/>
+          Scatter
+        </label>
+
+        <label>
+          <input type="checkbox" class="marker-checkbox line-checkbox"/>
+          Line
+        </label>
+      </div>
+    </template>
+
+    <script src="main.js"></script>
+    <noscript>Enable JavaScript in order for this website to work properly.</noscript>
+
+  </body>
+
+</html>
