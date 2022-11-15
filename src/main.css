@@ -17,12 +17,27 @@ body {
   height: 60vh;
 }
 
-#series-buttons, .series {
+#buttons, .series {
   margin: 1% 2%;
 }
 
 button, select {
   font-size: large;
+  margin-right: 1em;
+}
+
+input {
+  color: var(--bg);
+  font-size: large;
+  margin-left: 1em;
+}
+
+#file-input {
+ margin-left: 0;
+}
+
+.remove-series-button {
+  margin-left: 1em;
 }
 
 #loading {

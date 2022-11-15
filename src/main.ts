@@ -37,6 +37,8 @@ const default_trace: Partial<Plotly.PlotData> = {
      mode: 'markers'
 };
 
+// series management //
+
 const addSeries = () =>
 {
   const template = document.querySelector('#series-template') as HTMLTemplateElement;
@@ -68,18 +70,57 @@ const addSeries = () =>
       updateAxis(series, index);
     })
 
+  series.querySelector('.remove-series-button')
+    .addEventListener('click', () => {
+      removeSeries(series, index);
+  });
+
   updateSeries(series);
   document.querySelector('body').appendChild(seriesNode);
   Plotly.addTraces('plot', default_trace);
 };
 
-const removeSeries = () => {
-  if (seriesCounter > 1) {
+const removeSeries = (series: HTMLElement, index: number) => {
+  if (seriesCounter > 0) {
     seriesCounter--;
-    document.querySelector('#series-' + seriesCounter).remove();
-    Plotly.deleteTraces('plot', [-1]);
+    series.remove();
+    console.log(index);
+    Plotly.deleteTraces('plot', [index]);
+
+    for (const otherSeries of document.querySelectorAll('.series') as NodeListOf<HTMLElement>) {
+      let seriesIndex = parseInt(otherSeries.id.split('-')[1]);
+      if (seriesIndex > index) {
+        otherSeries.id = 'series-' + --seriesIndex;
+        updateTrace(otherSeries, seriesIndex);
+      }
+    }
   }
 };
+
+document.querySelector('#add-series-button')
+ .addEventListener('click', () => {
+   addSeries();
+ });
+
+// plot creation //
+
+Plotly.newPlot('plot', [], default_layout, default_plot_options)
+  .then((plot) => {
+    plot.on('plotly_relayout', (event: any) => {
+      if (
+        (firstFile || firstTrace) &&
+        'title.text' in event &&
+        event['title.text'] !== fileInstruction &&
+        event['title.text'] !== traceInstruction
+      ) {
+        firstFile = false;
+        firstTrace = false;
+      }
+    });
+    addSeries();
+  });
+
+// series updates //
 
 const updateSelect = (select: HTMLSelectElement, options: string[]) => {
   const selection = select.value;
@@ -177,6 +218,8 @@ const updateAxis = (series: HTMLElement, index: number) => {
   Plotly.restyle('plot', {yaxis: yaxis}, index);
 };
 
+// file management //
+
 const transpose = (result: Papa.ParseResult<CSVRow>): CSVObject => {
  const ret: CSVObject = {};
 
@@ -218,31 +261,12 @@ const addFile = (file: File) => {
   });
 };
 
-Plotly.newPlot('plot', [], default_layout, default_plot_options)
-  .then((plot) => {
-    plot.on('plotly_relayout', (event: any) => {
-      if (
-        (firstFile || firstTrace) &&
-        'title.text' in event &&
-        event['title.text'] !== fileInstruction &&
-        event['title.text'] !== traceInstruction
-      ) {
-        firstFile = false;
-        firstTrace = false;
-      }
-    });
-    addSeries();
+document.querySelector('#file-input')
+  .addEventListener('change', (event) => {
+    for (const file of (event.target as HTMLInputElement).files) {
+      addFile(file);
+    }
   });
-
-document.querySelector('#add-series-button')
- .addEventListener('click', () => {
-   addSeries();
- });
-
-document.querySelector('.remove-series-button')
-  .addEventListener('click', () => {
-    removeSeries();
-});
 
 window.addEventListener('dragover', (event) => {
   event.preventDefault();
@@ -258,6 +282,8 @@ window.addEventListener('drop', (event) => {
     }
   }
 }, false);
+
+// loading //
 
 const observer = new MutationObserver(() => {
   window.dispatchEvent(new Event('resize'));

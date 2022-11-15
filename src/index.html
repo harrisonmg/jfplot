@@ -19,9 +19,9 @@
 
     <div id="plot"></div>
 
-    <div id="series-buttons">
+    <div id="buttons">
       <button id="add-series-button">Add Series</button>
-      <button class="remove-series-button">Remove Series</button>
+      <input type="file" id="file-input" multiple/>
     </div>
 
     <template id="series-template">
@@ -56,6 +56,9 @@
           <input type="checkbox" class="y2-checkbox"/>
           Secondary Y Axis
         </label>
+
+        <button class="remove-series-button">Remove</button>
+
       </div>
     </template>
 
