@@ -37,14 +37,15 @@ const default_trace: Partial<Plotly.PlotData> = {
      mode: 'markers'
 };
 
+// series management //
+
 const addSeries = () =>
 {
   const template = document.querySelector('#series-template') as HTMLTemplateElement;
   const seriesNode = template.content.cloneNode(true);
   const series = (seriesNode as HTMLElement).querySelector('div');
 
-  const index = seriesCounter++;
-  series.id = 'series-' + index;
+  series.setAttribute('index', (seriesCounter++).toString());
 
   series.querySelector('.file-select')
    .addEventListener('change', () => {
@@ -53,33 +54,74 @@ const addSeries = () =>
 
   for (const traceSelect of series.querySelectorAll('.trace-select')) {
    traceSelect.addEventListener('change', () => {
-     updateTrace(series, index);
+     updateTrace(series);
    });
   }
 
   for (const markerCheckbox of series.querySelectorAll('.marker-checkbox')) {
    markerCheckbox.addEventListener('click', () => {
-     updateMarkers(series, index);
+     updateMarkers(series);
    });
   }
 
   series.querySelector('.y2-checkbox')
     .addEventListener('click', () => {
-      updateAxis(series, index);
+      updateAxis(series);
     })
+
+  series.querySelector('.remove-series-button')
+    .addEventListener('click', () => {
+      removeSeries(series);
+  });
 
   updateSeries(series);
   document.querySelector('body').appendChild(seriesNode);
   Plotly.addTraces('plot', default_trace);
 };
 
-const removeSeries = () => {
-  if (seriesCounter > 1) {
+const removeSeries = (series: HTMLElement) => {
+  if (seriesCounter > 0) {
     seriesCounter--;
-    document.querySelector('#series-' + seriesCounter).remove();
-    Plotly.deleteTraces('plot', [-1]);
+
+    const index = parseInt(series.getAttribute('index'));
+    series.remove();
+    console.log(index);
+    Plotly.deleteTraces('plot', [index]);
+
+    for (const otherSeries of document.querySelectorAll('.series') as NodeListOf<HTMLElement>) {
+      const oldIndex = parseInt(otherSeries.getAttribute('index'));
+      if (oldIndex > index) {
+        otherSeries.setAttribute('index', (oldIndex - 1).toString());
+        updateTrace(otherSeries);
+      }
+    }
   }
 };
+
+document.querySelector('#add-series-button')
+ .addEventListener('click', () => {
+   addSeries();
+ });
+
+// plot creation //
+
+Plotly.newPlot('plot', [], default_layout, default_plot_options)
+  .then((plot) => {
+    plot.on('plotly_relayout', (event: any) => {
+      if (
+        (firstFile || firstTrace) &&
+        'title.text' in event &&
+        event['title.text'] !== fileInstruction &&
+        event['title.text'] !== traceInstruction
+      ) {
+        firstFile = false;
+        firstTrace = false;
+      }
+    });
+    addSeries();
+  });
+
+// series updates //
 
 const updateSelect = (select: HTMLSelectElement, options: string[]) => {
   const selection = select.value;
@@ -129,7 +171,8 @@ const updateColumns = (series: HTMLElement) => {
   }
 };
 
-const updateTrace = (series: HTMLElement, index: number) => {
+const updateTrace = (series: HTMLElement) => {
+  const index = parseInt(series.getAttribute('index'));
   const file = (series.querySelector('.file-select') as HTMLSelectElement).value;
   const x = (series.querySelector('.x-select') as HTMLSelectElement).value;
   const y = (series.querySelector('.y-select') as HTMLSelectElement).value;
@@ -148,7 +191,8 @@ const updateTrace = (series: HTMLElement, index: number) => {
   }
 };
 
-const updateMarkers = (series: HTMLElement, index: number) => {
+const updateMarkers = (series: HTMLElement) => {
+  const index = parseInt(series.getAttribute('index'));
   const scatter = (series.querySelector('.scatter-checkbox') as HTMLInputElement).checked;
   const line = (series.querySelector('.line-checkbox') as HTMLInputElement).checked;
 
@@ -166,7 +210,8 @@ const updateMarkers = (series: HTMLElement, index: number) => {
   Plotly.restyle('plot', {mode: mode}, index);
 };
 
-const updateAxis = (series: HTMLElement, index: number) => {
+const updateAxis = (series: HTMLElement) => {
+  const index = parseInt(series.getAttribute('index'));
   const y2 = (series.querySelector('.y2-checkbox') as HTMLInputElement).checked;
 
   let yaxis = '';
@@ -176,6 +221,8 @@ const updateAxis = (series: HTMLElement, index: number) => {
 
   Plotly.restyle('plot', {yaxis: yaxis}, index);
 };
+
+// file management //
 
 const transpose = (result: Papa.ParseResult<CSVRow>): CSVObject => {
  const ret: CSVObject = {};
@@ -218,31 +265,12 @@ const addFile = (file: File) => {
   });
 };
 
-Plotly.newPlot('plot', [], default_layout, default_plot_options)
-  .then((plot) => {
-    plot.on('plotly_relayout', (event: any) => {
-      if (
-        (firstFile || firstTrace) &&
-        'title.text' in event &&
-        event['title.text'] !== fileInstruction &&
-        event['title.text'] !== traceInstruction
-      ) {
-        firstFile = false;
-        firstTrace = false;
-      }
-    });
-    addSeries();
+document.querySelector('#file-input')
+  .addEventListener('change', (event) => {
+    for (const file of (event.target as HTMLInputElement).files) {
+      addFile(file);
+    }
   });
-
-document.querySelector('#add-series-button')
- .addEventListener('click', () => {
-   addSeries();
- });
-
-document.querySelector('.remove-series-button')
-  .addEventListener('click', () => {
-    removeSeries();
-});
 
 window.addEventListener('dragover', (event) => {
   event.preventDefault();
@@ -258,6 +286,8 @@ window.addEventListener('drop', (event) => {
     }
   }
 }, false);
+
+// loading //
 
 const observer = new MutationObserver(() => {
   window.dispatchEvent(new Event('resize'));
