@@ -1,2 +1,3 @@
+* something better than series divs wrapping
 * tips / bug report / feature request / made by
 * subplots

@@ -45,8 +45,7 @@ const addSeries = () =>
   const seriesNode = template.content.cloneNode(true);
   const series = (seriesNode as HTMLElement).querySelector('div');
 
-  const index = seriesCounter++;
-  series.id = 'series-' + index;
+  series.setAttribute('index', (seriesCounter++).toString());
 
   series.querySelector('.file-select')
    .addEventListener('change', () => {
@@ -55,24 +54,24 @@ const addSeries = () =>
 
   for (const traceSelect of series.querySelectorAll('.trace-select')) {
    traceSelect.addEventListener('change', () => {
-     updateTrace(series, index);
+     updateTrace(series);
    });
   }
 
   for (const markerCheckbox of series.querySelectorAll('.marker-checkbox')) {
    markerCheckbox.addEventListener('click', () => {
-     updateMarkers(series, index);
+     updateMarkers(series);
    });
   }
 
   series.querySelector('.y2-checkbox')
     .addEventListener('click', () => {
-      updateAxis(series, index);
+      updateAxis(series);
     })
 
   series.querySelector('.remove-series-button')
     .addEventListener('click', () => {
-      removeSeries(series, index);
+      removeSeries(series);
   });
 
   updateSeries(series);
@@ -80,18 +79,20 @@ const addSeries = () =>
   Plotly.addTraces('plot', default_trace);
 };
 
-const removeSeries = (series: HTMLElement, index: number) => {
+const removeSeries = (series: HTMLElement) => {
   if (seriesCounter > 0) {
     seriesCounter--;
+
+    const index = parseInt(series.getAttribute('index'));
     series.remove();
     console.log(index);
     Plotly.deleteTraces('plot', [index]);
 
     for (const otherSeries of document.querySelectorAll('.series') as NodeListOf<HTMLElement>) {
-      let seriesIndex = parseInt(otherSeries.id.split('-')[1]);
-      if (seriesIndex > index) {
-        otherSeries.id = 'series-' + --seriesIndex;
-        updateTrace(otherSeries, seriesIndex);
+      const oldIndex = parseInt(otherSeries.getAttribute('index'));
+      if (oldIndex > index) {
+        otherSeries.setAttribute('index', (oldIndex - 1).toString());
+        updateTrace(otherSeries);
       }
     }
   }
@@ -170,7 +171,8 @@ const updateColumns = (series: HTMLElement) => {
   }
 };
 
-const updateTrace = (series: HTMLElement, index: number) => {
+const updateTrace = (series: HTMLElement) => {
+  const index = parseInt(series.getAttribute('index'));
   const file = (series.querySelector('.file-select') as HTMLSelectElement).value;
   const x = (series.querySelector('.x-select') as HTMLSelectElement).value;
   const y = (series.querySelector('.y-select') as HTMLSelectElement).value;
@@ -189,7 +191,8 @@ const updateTrace = (series: HTMLElement, index: number) => {
   }
 };
 
-const updateMarkers = (series: HTMLElement, index: number) => {
+const updateMarkers = (series: HTMLElement) => {
+  const index = parseInt(series.getAttribute('index'));
   const scatter = (series.querySelector('.scatter-checkbox') as HTMLInputElement).checked;
   const line = (series.querySelector('.line-checkbox') as HTMLInputElement).checked;
 
@@ -207,7 +210,8 @@ const updateMarkers = (series: HTMLElement, index: number) => {
   Plotly.restyle('plot', {mode: mode}, index);
 };
 
-const updateAxis = (series: HTMLElement, index: number) => {
+const updateAxis = (series: HTMLElement) => {
+  const index = parseInt(series.getAttribute('index'));
   const y2 = (series.querySelector('.y2-checkbox') as HTMLInputElement).checked;
 
   let yaxis = '';
