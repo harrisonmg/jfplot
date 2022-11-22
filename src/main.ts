@@ -75,7 +75,7 @@ const addSeries = () =>
   });
 
   updateSeries(series);
-  document.querySelector('body').appendChild(seriesNode);
+  document.querySelector('.series-box').appendChild(seriesNode);
   Plotly.addTraces('plot', default_trace);
 };
 

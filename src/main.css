@@ -1,5 +1,8 @@
 :root {
   --bg: #282828;
+  --bg1: #3c3836;
+  --sp: 12.5px;
+  --sp2: calc(var(--sp) * 2);
 }
 
 body {
@@ -13,97 +16,73 @@ body {
 #plot {
   resize: both;
   overflow: hidden;
-  margin: 2%;
-  height: 60vh;
+  margin: var(--sp2);
+  height: 55vh;
 }
 
-#buttons, .series {
-  margin: 1% 2%;
+#buttons, .series-box {
+  margin: var(--sp2);
 }
 
-button, select {
+button {
   font-size: large;
-  margin-right: 1em;
+  margin-right: var(--sp);
 }
 
 input {
   color: var(--bg);
   font-size: large;
-  margin-left: 1em;
+  margin-left: 0;
 }
 
 #file-input {
  margin-left: 0;
 }
 
-.remove-series-button {
-  margin-left: 1em;
-}
-
-#loading {
-  position: fixed;
+.series-box {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  z-index: 1;
-  background-color: var(--bg);
+  flex-wrap: wrap;
+  gap: var(--sp)
 }
 
-.lds-ellipsis {
-  position: relative;
-  width: 80px;
-  height: 80px;
+.series {
+  flex: 1;
+  padding: 20px;
+  background-color: var(--bg1);
+  background-origin: padding-box;
+  border-radius: 5px;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
-.lds-ellipsis div {
-  position: absolute;
-  top: 33px;
-  width: 13px;
-  height: 13px;
-  border-radius: 50%;
-  background: white;
-  animation-timing-function: cubic-bezier(0, 1, 1, 0);
+
+.series > * {
+  display: block;
+  margin-bottom: 5px;
+  white-space: nowrap;
 }
-.lds-ellipsis div:nth-child(1) {
-  left: 8px;
-  animation: lds-ellipsis1 0.6s infinite;
+
+.series > button {
+  margin-bottom: 0;
 }
-.lds-ellipsis div:nth-child(2) {
-  left: 8px;
-  animation: lds-ellipsis2 0.6s infinite;
+
+.series-selects {
+  display: inline-grid;
+  grid-template-columns: 40px 1fr
 }
-.lds-ellipsis div:nth-child(3) {
-  left: 32px;
-  animation: lds-ellipsis2 0.6s infinite;
+
+.series-selects > * {
+  margin-bottom: 5px;
 }
-.lds-ellipsis div:nth-child(4) {
-  left: 56px;
-  animation: lds-ellipsis3 0.6s infinite;
+
+.series-selects > label {
+  font-size: 0;
 }
-@keyframes lds-ellipsis1 {
-  0% {
-    transform: scale(0);
-  }
-  100% {
-    transform: scale(1);
-  }
+
+select {
+  font-size: large;
+  text-overflow: ellipsis;
+  width: 100%;
 }
-@keyframes lds-ellipsis3 {
-  0% {
-    transform: scale(1);
-  }
-  100% {
-    transform: scale(0);
-  }
-}
-@keyframes lds-ellipsis2 {
-  0% {
-    transform: translate(0, 0);
-  }
-  100% {
-    transform: translate(24px, 0);
-  }
+
+.line-checkbox {
+  margin-left: 15px;
 }

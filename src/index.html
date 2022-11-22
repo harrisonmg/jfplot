@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>jfplot</title>
     <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="loading.css">
 
   </head>
 
@@ -24,34 +25,42 @@
       <input type="file" id="file-input" multiple/>
     </div>
 
+    <div class="series-box"></div>
+
     <template id="series-template">
-      <div class='series'>
+      <div class="series">
 
-        <label>
-          File
-          <select class="file-select"></select>
-        </label>
+        <div class="series-selects">
+          <span>File</span>
+          <label>
+            File
+            <select class="file-select"></select>
+          </label>
 
-        <label>
-          X
-          <select class="trace-select x-select"></select>
-        </label>
+          <span>X</span>
+          <label>
+            X
+            <select class="trace-select x-select"></select>
+          </label>
 
-        <label>
-          Y
-          <select class="trace-select y-select"></select>
-        </label>
+          <span>Y</span>
+          <label>
+            Y
+            <select class="trace-select y-select"></select>
+          </label>
+        </div>
 
-        <label>
-          <input type="checkbox" class="marker-checkbox scatter-checkbox" checked/>
-          Scatter
-        </label>
+        <div>
+          <label>
+            <input type="checkbox" class="marker-checkbox scatter-checkbox" checked/>
+            Scatter
+          </label>
 
-        <label>
-          <input type="checkbox" class="marker-checkbox line-checkbox"/>
-          Line
-        </label>
-
+          <label>
+            <input type="checkbox" class="marker-checkbox line-checkbox"/>
+            Line
+          </label>
+        </div>
         <label>
           <input type="checkbox" class="y2-checkbox"/>
           Secondary Y Axis

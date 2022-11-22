@@ -1,3 +1,4 @@
-* something better than series divs wrapping
+* loading animation for slow series operations
+* maybe speed up adding / removing series?
 * tips / bug report / feature request / made by
 * subplots
