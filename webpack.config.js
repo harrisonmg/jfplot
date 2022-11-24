@@ -35,6 +35,7 @@ module.exports = {
         { from: 'src/index.html' },
         { from: 'src/main.css' },
         { from: 'src/loading.css' },
+        { from: 'src/modal.css' }
       ]
     })
   ]

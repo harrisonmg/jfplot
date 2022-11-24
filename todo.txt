@@ -1,4 +1,4 @@
-* loading animation for slow series operations
-* maybe speed up adding / removing series?
-* tips / bug report / feature request / made by
+* style
+* seo
+* data operations / downsample
 * subplots

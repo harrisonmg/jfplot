@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "serve": "webpack serve --open",
-    "build": "webpack"
+    "build": "webpack",
+    "fix-types": "mv node_modules/@types/plotly.js node_modules/@types/plotly.js-dist"
   },
   "repository": {
     "type": "git",

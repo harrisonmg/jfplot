@@ -85,7 +85,6 @@ const removeSeries = (series: HTMLElement) => {
 
     const index = parseInt(series.getAttribute('index'));
     series.remove();
-    console.log(index);
     Plotly.deleteTraces('plot', [index]);
 
     for (const otherSeries of document.querySelectorAll('.series') as NodeListOf<HTMLElement>) {
@@ -119,7 +118,14 @@ Plotly.newPlot('plot', [], default_layout, default_plot_options)
       }
     });
     addSeries();
+    (document.querySelector('#loading') as HTMLElement).style.display = 'none';
   });
+
+const observer = new MutationObserver(() => {
+  window.dispatchEvent(new Event('resize'));
+});
+
+observer.observe(document.querySelector('#plot'), {attributes: true});
 
 // series updates //
 
@@ -287,12 +293,20 @@ window.addEventListener('drop', (event) => {
   }
 }, false);
 
-// loading //
+// help modal //
 
-const observer = new MutationObserver(() => {
-  window.dispatchEvent(new Event('resize'));
+const helpModal = document.querySelector('#help-modal') as HTMLElement;
+
+document.querySelector('#help-button').addEventListener('click', () => {
+  helpModal.style.display = 'flex';
 });
 
-observer.observe(document.querySelector('#plot'), {attributes: true});
+document.querySelector('#help-close').addEventListener('click', () => {
+  helpModal.style.display = 'none';
+});
 
-(document.querySelector('#loading') as HTMLElement).style.display = 'none';
+window.addEventListener('click', (event: MouseEvent) => {
+  if (event.target == helpModal) {
+    helpModal.style.display = 'none';
+  }
+});
