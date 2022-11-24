@@ -20,7 +20,8 @@ body {
   height: 55vh;
 }
 
-#buttons, .series-box {
+#buttons,
+.series-box {
   margin: var(--sp2);
 }
 
@@ -46,7 +47,8 @@ input {
 }
 
 .series {
-  flex: 1;
+  flex: 1 1 min-content;
+  max-width: fit-content;
   padding: 20px;
   background-color: var(--bg1);
   background-origin: padding-box;
@@ -56,21 +58,12 @@ input {
 
 .series > * {
   display: block;
-  margin-bottom: 5px;
   white-space: nowrap;
-}
-
-.series > button {
-  margin-bottom: 0;
 }
 
 .series-selects {
   display: inline-grid;
   grid-template-columns: 40px 1fr
-}
-
-.series-selects > * {
-  margin-bottom: 5px;
 }
 
 .series-selects > label {
@@ -83,6 +76,12 @@ select {
   width: 100%;
 }
 
-.line-checkbox {
+.line-checkbox,
+.remove-series-button {
   margin-left: 15px;
+}
+
+.series-selects > span,
+.marker-checkboxes {
+  margin-bottom: 10px;
 }

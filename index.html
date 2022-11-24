@@ -9,6 +9,7 @@
     <title>jfplot</title>
     <link rel="stylesheet" href="main.css">
     <link rel="stylesheet" href="loading.css">
+    <link rel="stylesheet" href="modal.css">
 
   </head>
 
@@ -23,6 +24,39 @@
     <div id="buttons">
       <button id="add-series-button">Add Series</button>
       <input type="file" id="file-input" multiple/>
+      <button id="help-button">?</button>
+    </div>
+
+    <div id="help-modal">
+      <div id="help-box">
+        <span id="help-close">&times;</span>
+        <div id="help-content">
+
+          <div>
+            <span>
+              <a href="https://github.com/harrisonmg/jfplot/issues/new">
+                Click here</a>
+              to report a bug or suggest a feature!
+            </span>
+          </div>
+
+          <div>
+            <span>Tips</span>
+            <ul>
+              <li>Click on the title, legend labels, or any axis to change text.</li>
+              <li>Resize the plot by dragging the bottom right corner.</li>
+              <li>Hide a series by clicking its marker in the legend.</li>
+            </ul>
+          </div>
+
+          <span>Made by
+            <a href="harrisonmg.net">
+              Harrison Gieraltowski
+            </a>
+          </span>
+
+        </div>
+      </div>
     </div>
 
     <div class="series-box"></div>
@@ -50,7 +84,7 @@
           </label>
         </div>
 
-        <div>
+        <div class="marker-checkboxes">
           <label>
             <input type="checkbox" class="marker-checkbox scatter-checkbox" checked/>
             Scatter
@@ -61,12 +95,14 @@
             Line
           </label>
         </div>
-        <label>
-          <input type="checkbox" class="y2-checkbox"/>
-          Secondary Y Axis
-        </label>
 
-        <button class="remove-series-button">Remove</button>
+        <div>
+          <label>
+            <input type="checkbox" class="y2-checkbox"/>
+            Y2
+          </label>
+          <button class="remove-series-button">Remove</button>
+        </div>
 
       </div>
     </template>
