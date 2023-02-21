@@ -257,6 +257,7 @@ const addFile = (file: File) => {
     dynamicTyping: true,
     skipEmptyLines: 'greedy',
     download: true,
+    comments: '#',
     complete: (result: Papa.ParseResult<CSVRow>) => {
       if (result.errors.length > 0) {
         const error = JSON.stringify(result.errors[0], null, 4);
