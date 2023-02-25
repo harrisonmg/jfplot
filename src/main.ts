@@ -50,6 +50,7 @@ const addSeries = () =>
   series.querySelector('.file-select')
    .addEventListener('change', () => {
      updateColumns(series);
+     updateTrace(series);
    });
 
   for (const traceSelect of series.querySelectorAll('.trace-select')) {
