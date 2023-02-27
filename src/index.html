@@ -32,7 +32,13 @@
     <div id="buttons">
       <button id="add-series-button">Add Series</button>
       <input type="file" id="file-input" multiple/>
-      <button id="help-button">?</button>
+      <div id="right-buttons">
+        <label>
+          <input type="checkbox" id="advanced-checkbox"/>
+          Advanced
+        </label>
+        <button id="help-button">?</button>
+      </div>
     </div>
 
     <div id="help-modal">
@@ -90,34 +96,91 @@
           <span>X</span>
           <label>
             X
-            <select class="trace-select x-select"></select>
+            <select class="trace-update x-select"></select>
           </label>
 
           <span>Y</span>
           <label>
             Y
-            <select class="trace-select y-select"></select>
+            <select class="trace-update y-select"></select>
           </label>
         </div>
 
-        <div class="marker-checkboxes">
-          <label>
-            <input type="checkbox" class="marker-checkbox scatter-checkbox" checked/>
-            Scatter
-          </label>
+        <div class="series-options">
+          <div>
+            <label>
+              <input type="checkbox" class="marker-checkbox scatter-checkbox" checked/>
+              Scatter
+            </label>
 
-          <label>
-            <input type="checkbox" class="marker-checkbox line-checkbox"/>
-            Line
-          </label>
-        </div>
+            <label>
+              <input type="checkbox" class="marker-checkbox line-checkbox"/>
+              Line
+            </label>
+          </div>
 
-        <div>
-          <label>
-            <input type="checkbox" class="y2-checkbox"/>
-            Y2
-          </label>
-          <button class="remove-series-button">Remove</button>
+          <div>
+            <label>
+              <input type="checkbox" class="y2-checkbox"/>
+              Y2
+            </label>
+            <button class="remove-series-button">Remove</button>
+          </div>
+
+          <div class="advanced-series-option" hidden>
+            <label>
+              <input type="checkbox" class="default-series-checkbox"/>
+              Default Series
+            </label>
+          </div>
+
+          <div class="advanced-series-option transform-series-options" hidden>
+            <div>
+              <span></span>
+              <span>Scale</span>
+              <span>Offset</span>
+            </div>
+
+            <div>
+              <span>X</span>
+              <label>
+                X Scale
+                <input
+                  class="x-transform-scale trace-update"
+                  type="number"
+                  step="any"
+                ></input>
+              </label>
+              <label>
+                X Offset
+                <input
+                  class="x-transform-offset trace-update"
+                  type="number"
+                  step="any"
+                ></input>
+              </label>
+            </div>
+
+            <div>
+              <span>Y</span>
+              <label>
+                Y Scale
+                <input
+                  class="y-transform-scale trace-update"
+                  type="number"
+                  step="any"
+                ></input>
+              </label>
+              <label>
+                Y Offset
+                <input
+                  class="y-transform-offset trace-update"
+                  type="number"
+                  step="any"
+                ></input>
+              </label>
+            </div>
+          </div>
         </div>
 
       </div>

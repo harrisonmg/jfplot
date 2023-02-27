@@ -9,6 +9,8 @@ type CSVRow = { [key: string]: any };
 const dfs: { [key: string]: CSVObject } = {};
 
 let seriesCounter = 0;
+let defaultSeries: HTMLElement = null;
+
 let firstFile = true;
 let firstTrace = true;
 
@@ -53,7 +55,7 @@ const addSeries = () =>
      updateTrace(series);
    });
 
-  for (const traceSelect of series.querySelectorAll('.trace-select')) {
+  for (const traceSelect of series.querySelectorAll('.trace-update')) {
    traceSelect.addEventListener('change', () => {
      updateTrace(series);
    });
@@ -75,10 +77,65 @@ const addSeries = () =>
       removeSeries(series);
   });
 
+  series.querySelector('.default-series-checkbox')
+    .addEventListener('click', () => {
+      updateDefault(series);
+  });
+
   updateSeries(series);
   document.querySelector('.series-box').appendChild(seriesNode);
   Plotly.addTraces('plot', default_trace);
+
+  if (defaultSeries != null) {
+    const setDefaultSelect = (selector: string) => {
+      const select: HTMLSelectElement = series.querySelector(selector);
+      const defaultSelect: HTMLSelectElement = defaultSeries.querySelector(selector);
+      select.value = defaultSelect.value;
+      select.dispatchEvent(new Event('change'));
+    }
+
+    setDefaultSelect('.file-select');
+    setDefaultSelect('.x-select');
+    setDefaultSelect('.y-select');
+
+    const setDefaultCheckbox = (selector: string) => {
+      const checkbox: HTMLInputElement = series.querySelector(selector);
+      const defaultCheckbox: HTMLInputElement = defaultSeries.querySelector(selector);
+      checkbox.checked = defaultCheckbox.checked;
+      checkbox.dispatchEvent(new Event('click'));
+    }
+
+    setDefaultCheckbox('.scatter-checkbox');
+    setDefaultCheckbox('.line-checkbox');
+    setDefaultCheckbox('.y2-checkbox');
+
+    const setDefaultValue = (selector: string) => {
+      const input: HTMLInputElement = series.querySelector(selector);
+      const defaultInput: HTMLInputElement = defaultSeries.querySelector(selector);
+      input.value = defaultInput.value;
+      input.dispatchEvent(new Event('change'));
+    }
+
+    setDefaultValue('.x-transform-scale');
+    setDefaultValue('.x-transform-offset');
+    setDefaultValue('.y-transform-scale');
+    setDefaultValue('.y-transform-offset');
+  }
 };
+
+const updateDefault = (series: HTMLElement) => {
+  const checkbox = series.querySelector('.default-series-checkbox') as HTMLInputElement;
+  if (checkbox.checked) {
+    defaultSeries = series;
+    for (const otherCheckbox of document.querySelectorAll('.default-series-checkbox') as NodeListOf<HTMLInputElement>) {
+      if (otherCheckbox != checkbox) {
+        otherCheckbox.checked = false;
+      }
+    }
+  } else if (defaultSeries == series) {
+    defaultSeries = null;
+  }
+}
 
 const removeSeries = (series: HTMLElement) => {
   if (seriesCounter > 0) {
@@ -179,21 +236,44 @@ const updateColumns = (series: HTMLElement) => {
 };
 
 const updateTrace = (series: HTMLElement) => {
-  const index = parseInt(series.getAttribute('index'));
   const file = (series.querySelector('.file-select') as HTMLSelectElement).value;
   const x = (series.querySelector('.x-select') as HTMLSelectElement).value;
   const y = (series.querySelector('.y-select') as HTMLSelectElement).value;
+
   if (file !== '' && x !== '' && y !== '') {
     if (firstTrace) {
       Plotly.relayout('plot', {title: ''});
     }
     firstTrace = false;
 
-    const trace = {
-      x: [dfs[file][x]],
-      y: [dfs[file][y]]
+    const xScale = parseFloat((series.querySelector('.x-transform-scale') as HTMLInputElement).value);
+    const xOffset = parseFloat((series.querySelector('.x-transform-offset') as HTMLInputElement).value);
+
+    const yScale = parseFloat((series.querySelector('.y-transform-scale') as HTMLInputElement).value);
+    const yOffset = parseFloat((series.querySelector('.y-transform-offset') as HTMLInputElement).value);
+
+    const transform = (data: number[], scale: number, offset: number) => {
+      if (isNaN(scale) && isNaN(offset)) {
+        return data;
+      }
+
+      if (isNaN(scale)) {
+        scale = 1;
+      }
+
+      if (isNaN(offset)) {
+        offset = 0;
+      }
+
+      return data.map((datum: number) => datum * scale + offset);
     }
 
+    const trace = {
+      x: [transform(dfs[file][x], xScale, xOffset)],
+      y: [transform(dfs[file][y], yScale, yOffset)]
+    }
+
+    const index = parseInt(series.getAttribute('index'));
     Plotly.restyle('plot', trace, index);
   }
 };
@@ -294,6 +374,19 @@ window.addEventListener('drop', (event) => {
     }
   }
 }, false);
+
+// advanced options //
+
+const advanced = document.querySelector('#advanced-checkbox') as HTMLInputElement;
+
+const updateAdvanced = () => {
+  const checked = advanced.checked;
+  for (const option of document.querySelectorAll('.advanced-series-option') as NodeListOf<HTMLElement>) {
+    option.hidden = !checked;
+  }
+}
+
+advanced.addEventListener('click', updateAdvanced);
 
 // help modal //
 
