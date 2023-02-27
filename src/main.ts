@@ -36,7 +36,7 @@ const default_plot_options: Partial<Plotly.Config> = {
 };
 
 const default_trace: Partial<Plotly.PlotData> = {
-     mode: 'markers'
+     mode: 'lines'
 };
 
 // series management //
@@ -105,8 +105,8 @@ const addSeries = () =>
       checkbox.dispatchEvent(new Event('click'));
     }
 
-    setDefaultCheckbox('.scatter-checkbox');
     setDefaultCheckbox('.line-checkbox');
+    setDefaultCheckbox('.scatter-checkbox');
     setDefaultCheckbox('.y2-checkbox');
 
     const setDefaultValue = (selector: string) => {
@@ -280,10 +280,11 @@ const updateTrace = (series: HTMLElement) => {
 
 const updateMarkers = (series: HTMLElement) => {
   const index = parseInt(series.getAttribute('index'));
-  const scatter = (series.querySelector('.scatter-checkbox') as HTMLInputElement).checked;
   const line = (series.querySelector('.line-checkbox') as HTMLInputElement).checked;
+  const scatter = (series.querySelector('.scatter-checkbox') as HTMLInputElement).checked;
 
   let mode: Plotly.PlotData['mode'] = 'none';
+
   if (scatter) {
     if (line) {
       mode = 'lines+markers';
