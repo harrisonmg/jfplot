@@ -85,7 +85,7 @@ select {
   width: 100%;
 }
 
-.line-checkbox,
+.scatter-checkbox,
 .remove-series-button {
   margin-left: 15px;
 }
