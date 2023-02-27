@@ -121,6 +121,8 @@ const addSeries = () =>
     setDefaultValue('.y-transform-scale');
     setDefaultValue('.y-transform-offset');
   }
+
+  updateAdvanced();
 };
 
 const updateDefault = (series: HTMLElement) => {
