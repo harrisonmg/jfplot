@@ -1,4 +1,0 @@
-* style
-* seo
-* data operations / downsample
-* subplots
