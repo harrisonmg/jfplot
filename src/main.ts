@@ -3,10 +3,10 @@
 import * as Plotly from 'plotly.js-dist';
 import * as Papa from 'papaparse';
 
-type CSVObject = { [key: string]: any[] };
 type CSVRow = { [key: string]: any };
+type CSV = Papa.ParseResult<CSVRow>;
 
-const dfs: { [key: string]: CSVObject } = {};
+const dfs: { [key: string]: CSV } = {};
 
 let seriesCounter = 0;
 let defaultSeries: HTMLElement = null;
@@ -227,22 +227,40 @@ const updateColumns = (series: HTMLElement) => {
   const xSelect = series.querySelector('.x-select') as HTMLSelectElement;
   const ySelect = series.querySelector('.y-select') as HTMLSelectElement;
 
-  const keys = Object.keys(dfs[fileSelect.value]);
+  const field_dict = dfs[fileSelect.value].meta.fields;
+  // @ts-ignore
+  const fields = Object.keys(field_dict).map((key) => field_dict[key]);
 
-  updateSelect(xSelect, keys);
-  updateSelect(ySelect, keys);
+  updateSelect(xSelect, fields);
+  updateSelect(ySelect, fields);
 
   if (xSelect.value === '') {
-    xSelect.value = keys[0];
+    xSelect.value = fields[0];
   }
 };
 
+const transformData = (data: number[], scale: number, offset: number) => {
+  if (isNaN(scale) && isNaN(offset)) {
+    return data;
+  }
+
+  if (isNaN(scale)) {
+    scale = 1;
+  }
+
+  if (isNaN(offset)) {
+    offset = 0;
+  }
+
+  return data.map((datum: number) => datum * scale + offset);
+}
+
 const updateTrace = (series: HTMLElement) => {
   const file = (series.querySelector('.file-select') as HTMLSelectElement).value;
-  const x = (series.querySelector('.x-select') as HTMLSelectElement).value;
-  const y = (series.querySelector('.y-select') as HTMLSelectElement).value;
+  const x_label = (series.querySelector('.x-select') as HTMLSelectElement).value;
+  const y_label = (series.querySelector('.y-select') as HTMLSelectElement).value;
 
-  if (file !== '' && x !== '' && y !== '') {
+  if (file !== '' && x_label !== '' && y_label !== '') {
     if (firstTrace) {
       Plotly.relayout('plot', {title: ''});
     }
@@ -254,25 +272,30 @@ const updateTrace = (series: HTMLElement) => {
     const yScale = parseFloat((series.querySelector('.y-transform-scale') as HTMLInputElement).value);
     const yOffset = parseFloat((series.querySelector('.y-transform-offset') as HTMLInputElement).value);
 
-    const transform = (data: number[], scale: number, offset: number) => {
-      if (isNaN(scale) && isNaN(offset)) {
-        return data;
-      }
+    const trace_data = dfs[file].data;
 
-      if (isNaN(scale)) {
-        scale = 1;
-      }
+    trace_data.sort((a, b) => {
+      const ax = a[x_label];
+      const bx = b[x_label];
+       return ax < bx ? -1 :
+              ax > bx ? 1 :
+              0;
+    })
 
-      if (isNaN(offset)) {
-        offset = 0;
+    var x_data = [];
+    var y_data = [];
+    for (var i = 0; i < trace_data.length; i++) {
+      const x = trace_data[i][x_label];
+      const y = trace_data[i][y_label];
+      if (x !== null && y !== null) {
+        x_data.push(x);
+        y_data.push(y);
       }
-
-      return data.map((datum: number) => datum * scale + offset);
     }
 
     const trace = {
-      x: [transform(dfs[file][x], xScale, xOffset)],
-      y: [transform(dfs[file][y], yScale, yOffset)]
+      x: [transformData(x_data, xScale, xOffset)],
+      y: [transformData(y_data, yScale, yOffset)]
     }
 
     const index = parseInt(series.getAttribute('index'));
@@ -314,22 +337,6 @@ const updateAxis = (series: HTMLElement) => {
 
 // file management //
 
-const transpose = (result: Papa.ParseResult<CSVRow>): CSVObject => {
- const ret: CSVObject = {};
-
- for (const field of result.meta.fields) {
-   ret[field] = [];
- }
-
- for (const row of result.data) {
-   for (const field of Object.keys(row)) {
-     ret[field].push(row[field]);
-   }
- }
-
- return ret;
-};
-
 const addFile = (file: File) => {
   if (firstFile) {
     Plotly.relayout('plot', {title: traceInstruction})
@@ -347,7 +354,7 @@ const addFile = (file: File) => {
         const error = JSON.stringify(result.errors[0], null, 4);
         alert(`Failed to load file "${file.name}":\n${error}`);
       } else {
-        dfs[file.name] = transpose(result);
+        dfs[file.name] = result;
         for (const series of document.querySelectorAll('.series') as NodeListOf<HTMLElement>) {
           updateSeries(series);
         }
