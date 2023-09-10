@@ -14,7 +14,7 @@ let defaultSeries: HTMLElement = null;
 let firstFile = true;
 let firstTrace = true;
 
-const fileInstruction = 'Add files by dragging and dropping anywhere.';
+const fileInstruction = 'Add CSV files by dragging and dropping anywhere.';
 const traceInstruction = 'Select a file, x column and y column to plot a series.';
 
 const default_layout: Partial<Plotly.Layout> = {
