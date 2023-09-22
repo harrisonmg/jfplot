@@ -186,7 +186,7 @@ Plotly.newPlot('plot', [], default_layout, default_plot_options)
     // add middle click pan
     plot.addEventListener('mousedown', (event: any) => {
       let plot: any = document.querySelector('.js-plotly-plot');
-      plot._fullLayout.dragmode = event.buttons == 4? 'pan' : 'zoom';
+      plot._fullLayout.dragmode = event.buttons == 4 ? 'pan' : 'zoom';
     }, true);
   });
 
