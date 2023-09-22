@@ -177,8 +177,17 @@ Plotly.newPlot('plot', [], default_layout, default_plot_options)
         firstTrace = false;
       }
     });
+
+    // start with one series by default
     addSeries();
+
     (document.querySelector('#loading') as HTMLElement).style.display = 'none';
+
+    // add middle click pan
+    plot.addEventListener('mousedown', (event: any) => {
+      let plot: any = document.querySelector('.js-plotly-plot');
+      plot._fullLayout.dragmode = event.buttons == 4? 'pan' : 'zoom';
+    }, true);
   });
 
 const observer = new MutationObserver(() => {
@@ -282,9 +291,9 @@ const updateTrace = (series: HTMLElement) => {
               0;
     })
 
-    var x_data = [];
-    var y_data = [];
-    for (var i = 0; i < trace_data.length; i++) {
+    let x_data = [];
+    let y_data = [];
+    for (let i = 0; i < trace_data.length; i++) {
       const x = trace_data[i][x_label];
       const y = trace_data[i][y_label];
       if (x !== null && y !== null) {
