@@ -19,12 +19,19 @@ const traceInstruction = 'Select a file, x column and y column to plot a series.
 
 const default_layout: Partial<Plotly.Layout> = {
   title: fileInstruction,
-  xaxis: { title: '' },
-  yaxis: { title: '' },
+  xaxis: {
+    title: '',
+    automargin: true,
+  },
+  yaxis: {
+    title: '',
+    automargin: true,
+  },
   yaxis2: {
     title: '',
+    automargin: true,
     overlaying: 'y',
-    side:'right'
+    side: 'right',
   }
 };
 
