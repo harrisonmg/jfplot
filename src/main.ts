@@ -149,6 +149,8 @@ const removeSeries = (series: HTMLElement) => {
         updateTrace(otherSeries);
       }
     }
+
+    updateAxes();
   }
 };
 
