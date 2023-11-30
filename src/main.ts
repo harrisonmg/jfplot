@@ -19,20 +19,8 @@ const traceInstruction = 'Select a file, x column and y column to plot a series.
 
 const default_layout: Partial<Plotly.Layout> = {
   title: fileInstruction,
-  xaxis: {
-    title: '',
-    automargin: true,
-  },
-  yaxis: {
-    title: '',
-    automargin: true,
-  },
-  yaxis2: {
-    title: '',
-    automargin: true,
-    overlaying: 'y',
-    side: 'right',
-  }
+  xaxis: { title: '', automargin: true, },
+  yaxis: { title: '', automargin: true, },
 };
 
 const default_plot_options: Partial<Plotly.Config> = {
@@ -74,9 +62,9 @@ const addSeries = () =>
    });
   }
 
-  series.querySelector('.y2-checkbox')
+  series.querySelector('.subplot-checkbox')
     .addEventListener('click', () => {
-      updateAxis(series);
+      updateAxes();
     })
 
   series.querySelector('.remove-series-button')
@@ -114,7 +102,7 @@ const addSeries = () =>
 
     setDefaultCheckbox('.line-checkbox');
     setDefaultCheckbox('.scatter-checkbox');
-    setDefaultCheckbox('.y2-checkbox');
+    setDefaultCheckbox('.subplot-checkbox');
 
     const setDefaultValue = (selector: string) => {
       const input: HTMLInputElement = series.querySelector(selector);
@@ -243,6 +231,10 @@ const updateColumns = (series: HTMLElement) => {
   const xSelect = series.querySelector('.x-select') as HTMLSelectElement;
   const ySelect = series.querySelector('.y-select') as HTMLSelectElement;
 
+  if (fileSelect.value === '') {
+    return;
+  }
+
   const field_dict = dfs[fileSelect.value].meta.fields;
   // @ts-ignore
   const fields = Object.keys(field_dict).map((key) => field_dict[key]);
@@ -346,16 +338,32 @@ const updateMarkers = (series: HTMLElement) => {
   Plotly.restyle('plot', {mode: mode}, index);
 };
 
-const updateAxis = (series: HTMLElement) => {
-  const index = parseInt(series.getAttribute('index'));
-  const y2 = (series.querySelector('.y2-checkbox') as HTMLInputElement).checked;
-
-  let yaxis = '';
-  if (y2) {
-    yaxis = 'y2';
+const updateAxes = () => {
+  let layout: Partial<Plotly.Layout> = {
+    grid: {
+        rows: 1,
+        columns: 1,
+        subplots: ['xy'],
+    }
   }
 
-  Plotly.restyle('plot', {yaxis: yaxis}, index);
+  for (const series of document.querySelectorAll('.series') as NodeListOf<HTMLElement>) {
+    const index = parseInt(series.getAttribute('index'));
+    const subplot = (series.querySelector('.subplot-checkbox') as HTMLInputElement).checked;
+
+    let yaxis = 'y';
+    if (subplot) {
+      layout.grid.rows += 1;
+      yaxis += layout.grid.rows;
+      layout.grid.subplots.push('x' + yaxis);
+      // @ts-ignore
+      layout['yaxis' + layout.grid.rows] = { title: '', automargin: true, };
+    }
+
+    Plotly.restyle('plot', {yaxis: yaxis}, index);
+  }
+
+  Plotly.relayout('plot', layout);
 };
 
 // file management //

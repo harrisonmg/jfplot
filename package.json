@@ -22,7 +22,7 @@
   "homepage": "https://github.com/harrisonmg/jfplot#readme",
   "devDependencies": {
     "@types/papaparse": "^5.3.7",
-    "@types/plotly.js": "^2.12.18",
+    "@types/plotly.js": "^2.12.30",
     "copy-webpack-plugin": "^11.0.0",
     "ify-loader": "^1.1.0",
     "ts-loader": "^9.4.3",
@@ -33,6 +33,6 @@
   },
   "dependencies": {
     "papaparse": "^5.4.1",
-    "plotly.js-dist": "^2.24.1"
+    "plotly.js-dist": "^2.27.1"
   }
 }
