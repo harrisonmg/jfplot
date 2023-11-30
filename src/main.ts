@@ -271,6 +271,13 @@ const transformData = (data: number[], scale: number, offset: number) => {
   return data.map((datum: number) => datum * scale + offset);
 }
 
+const replotSeries = (series: HTMLElement, filename: string) => {
+  const file = (series.querySelector('.file-select') as HTMLSelectElement).value;
+  if (file === filename) {
+    updateTrace(series);
+  }
+}
+
 const updateTrace = (series: HTMLElement) => {
   const file = (series.querySelector('.file-select') as HTMLSelectElement).value;
   const x_label = (series.querySelector('.x-select') as HTMLSelectElement).value;
@@ -370,9 +377,13 @@ const addFile = (file: File) => {
         const error = JSON.stringify(result.errors[0], null, 4);
         alert(`Failed to load file "${file.name}":\n${error}`);
       } else {
+        let file_replaced = file.name in dfs;
         dfs[file.name] = result;
         for (const series of document.querySelectorAll('.series') as NodeListOf<HTMLElement>) {
           updateSeries(series);
+          if (file_replaced) {
+            replotSeries(series, file.name);
+          }
         }
       }
     },
