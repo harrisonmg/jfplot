@@ -1,0 +1,10 @@
+.series:nth-child(10n + 1) { border-color: #1f77b4; }
+.series:nth-child(10n + 2) { border-color: #ff7f0e; }
+.series:nth-child(10n + 3) { border-color: #2ca02c; }
+.series:nth-child(10n + 4) { border-color: #d62728; }
+.series:nth-child(10n + 5) { border-color: #9467bd; }
+.series:nth-child(10n + 6) { border-color: #8c564b; }
+.series:nth-child(10n + 7) { border-color: #e377c2; }
+.series:nth-child(10n + 8) { border-color: #7f7f7f; }
+.series:nth-child(10n + 9) { border-color: #bcbd22; }
+.series:nth-child(10n + 10) { border-color: #17becf; }

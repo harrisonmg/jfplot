@@ -34,6 +34,7 @@ module.exports = {
       patterns: [
         { from: 'src/index.html' },
         { from: 'src/main.css' },
+        { from: 'src/series_colors.css' },
         { from: 'src/loading.css' },
         { from: 'src/modal.css' }
       ]
