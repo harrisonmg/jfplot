@@ -317,6 +317,7 @@ const updateTrace = (series: HTMLElement) => {
 
     const index = parseInt(series.getAttribute('index'));
     Plotly.restyle('plot', trace, index);
+    Plotly.relayout('plot', {});
   }
 };
 
