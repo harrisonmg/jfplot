@@ -31,7 +31,8 @@ const default_plot_options: Partial<Plotly.Config> = {
 };
 
 const default_trace: Partial<Plotly.PlotData> = {
-     mode: 'lines'
+     mode: 'lines',
+     type: 'scattergl',
 };
 
 // series management //
