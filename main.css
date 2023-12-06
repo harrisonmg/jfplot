@@ -58,7 +58,7 @@ input {
 .series {
   flex: 1 1 min-content;
   max-width: fit-content;
-  padding: 17px 22px;
+  padding: 17px;
   background-color: var(--bg1);
   background-origin: padding-box;
   border-style: solid;
