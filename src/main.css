@@ -11,18 +11,24 @@ body {
   font-family: sans-serif;
   font-size: large;
   margin: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 #plot {
   resize: both;
   overflow: hidden;
-  margin: var(--sp2);
-  height: 58vh;
+  flex-grow: 1;
 }
 
-#buttons,
+#plot,
 .series-box {
   margin: var(--sp2);
+}
+
+#buttons {
+  margin: 0 var(--sp2);
 }
 
 button {
