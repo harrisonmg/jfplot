@@ -313,12 +313,12 @@ const updateTrace = (series: HTMLElement) => {
 
     const trace = {
       x: [transformData(x_data, xScale, xOffset)],
-      y: [transformData(y_data, yScale, yOffset)]
+      y: [transformData(y_data, yScale, yOffset)],
     }
 
     const index = parseInt(series.getAttribute('index'));
     Plotly.restyle('plot', trace, index);
-    Plotly.relayout('plot', {});
+    updateAxes();
   }
 };
 
@@ -347,7 +347,6 @@ const updateAxes = () => {
     grid: {
         rows: 1,
         columns: 1,
-        subplots: ['xy'],
     }
   }
 
@@ -359,12 +358,11 @@ const updateAxes = () => {
     if (subplot) {
       layout.grid.rows += 1;
       yaxis += layout.grid.rows;
-      layout.grid.subplots.push('x' + yaxis);
       // @ts-ignore
-      layout['yaxis' + layout.grid.rows] = { title: '', automargin: true, };
+      layout['yaxis' + layout.grid.rows] = { title: '', automargin: true };
     }
 
-    Plotly.restyle('plot', {yaxis: yaxis}, index);
+    Plotly.restyle('plot', { yaxis: yaxis }, index);
   }
 
   Plotly.relayout('plot', layout);
