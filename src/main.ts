@@ -32,13 +32,12 @@ const default_plot_options: Partial<Plotly.Config> = {
 
 const default_trace: Partial<Plotly.PlotData> = {
      mode: 'lines',
-     type: 'scattergl',
+     type: 'scatter',
 };
 
 // series management //
 
-const addSeries = () =>
-{
+const addSeries = () => {
   const template = document.querySelector('#series-template') as HTMLTemplateElement;
   const seriesNode = template.content.cloneNode(true);
   const series = (seriesNode as HTMLElement).querySelector('div');
@@ -87,7 +86,6 @@ const addSeries = () =>
       const select: HTMLSelectElement = series.querySelector(selector);
       const defaultSelect: HTMLSelectElement = defaultSeries.querySelector(selector);
       select.value = defaultSelect.value;
-      select.dispatchEvent(new Event('change'));
     }
 
     setDefaultSelect('.file-select');
@@ -98,7 +96,6 @@ const addSeries = () =>
       const checkbox: HTMLInputElement = series.querySelector(selector);
       const defaultCheckbox: HTMLInputElement = defaultSeries.querySelector(selector);
       checkbox.checked = defaultCheckbox.checked;
-      checkbox.dispatchEvent(new Event('click'));
     }
 
     setDefaultCheckbox('.line-checkbox');
@@ -109,13 +106,16 @@ const addSeries = () =>
       const input: HTMLInputElement = series.querySelector(selector);
       const defaultInput: HTMLInputElement = defaultSeries.querySelector(selector);
       input.value = defaultInput.value;
-      input.dispatchEvent(new Event('change'));
     }
 
     setDefaultValue('.x-transform-scale');
     setDefaultValue('.x-transform-offset');
     setDefaultValue('.y-transform-scale');
     setDefaultValue('.y-transform-offset');
+
+    updateColumns(series);
+    updateTrace(series);
+    updateMarkers(series);
   }
 
   updateAdvanced();
@@ -147,7 +147,7 @@ const removeSeries = (series: HTMLElement) => {
       const oldIndex = parseInt(otherSeries.getAttribute('index'));
       if (oldIndex > index) {
         otherSeries.setAttribute('index', (oldIndex - 1).toString());
-        updateTrace(otherSeries);
+        updateTrace(otherSeries, false);
       }
     }
 
@@ -266,7 +266,7 @@ const transformData = (data: number[], scale: number, offset: number) => {
   return data.map((datum: number) => datum * scale + offset);
 }
 
-const updateTrace = (series: HTMLElement) => {
+const updateTrace = (series: HTMLElement, update_axes: boolean = true) => {
   const file = (series.querySelector('.file-select') as HTMLSelectElement).value;
   const x_label = (series.querySelector('.x-select') as HTMLSelectElement).value;
   const y_label = (series.querySelector('.y-select') as HTMLSelectElement).value;
@@ -311,7 +311,10 @@ const updateTrace = (series: HTMLElement) => {
 
     const index = parseInt(series.getAttribute('index'));
     Plotly.restyle('plot', trace, index);
-    updateAxes();
+
+    if (update_axes) {
+      updateAxes();
+    }
   }
 };
 
@@ -433,6 +436,23 @@ const updateAdvanced = () => {
 }
 
 advanced.addEventListener('click', updateAdvanced);
+
+// large data (WebGL) //
+
+const large_data = document.querySelector('#large-data-checkbox') as HTMLInputElement;
+
+const updateLargeData = () => {
+  const checked = large_data.checked;
+  const new_type = checked ? "scattergl" : "scatter";
+  default_trace.type = new_type;
+  for (const series of document.querySelectorAll('.series') as NodeListOf<HTMLElement>) {
+    const index = parseInt(series.getAttribute('index'));
+    Plotly.restyle('plot', { type: new_type }, index);
+  }
+}
+
+large_data.addEventListener('click', updateLargeData);
+updateLargeData();
 
 // help modal //
 
