@@ -25,11 +25,10 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: var(--sp2);
 }
 
 #help-content > * {
-  margin: var(--sp2);
+  margin: var(--sp);
 }
 
 #help-content > * > * > li {
