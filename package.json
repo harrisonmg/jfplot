@@ -33,6 +33,6 @@
   },
   "dependencies": {
     "papaparse": "^5.4.1",
-    "plotly.js-dist": "^2.27.1"
+    "plotly.js-dist": "2.25.2"
   }
 }

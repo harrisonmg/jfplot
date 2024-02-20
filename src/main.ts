@@ -437,12 +437,12 @@ const updateAdvanced = () => {
 
 advanced.addEventListener('click', updateAdvanced);
 
-// large data (WebGL) //
+// big data (WebGL) //
 
-const large_data = document.querySelector('#large-data-checkbox') as HTMLInputElement;
+const big_data = document.querySelector('#big-data-checkbox') as HTMLInputElement;
 
-const updateLargeData = () => {
-  const checked = large_data.checked;
+const updateBigData = () => {
+  const checked = big_data.checked;
   const new_type = checked ? "scattergl" : "scatter";
   default_trace.type = new_type;
   for (const series of document.querySelectorAll('.series') as NodeListOf<HTMLElement>) {
@@ -451,8 +451,8 @@ const updateLargeData = () => {
   }
 }
 
-large_data.addEventListener('click', updateLargeData);
-updateLargeData();
+big_data.addEventListener('click', updateBigData);
+updateBigData();
 
 // help modal //
 
