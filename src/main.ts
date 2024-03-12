@@ -43,6 +43,7 @@ const addSeries = () => {
   const series = (seriesNode as HTMLElement).querySelector('div');
 
   series.setAttribute('index', (seriesCounter++).toString());
+  series.setAttribute('plot', '1');
 
   series.querySelector('.file-select')
    .addEventListener('change', () => {
@@ -62,10 +63,78 @@ const addSeries = () => {
    });
   }
 
-  series.querySelector('.subplot-checkbox')
-    .addEventListener('click', () => {
-      updateAxes();
-    })
+  const plot_1_button = series.querySelector('.plot-1-button') as HTMLButtonElement;
+  const plot_2_button = series.querySelector('.plot-2-button') as HTMLButtonElement;
+  const plot_3_button = series.querySelector('.plot-3-button') as HTMLButtonElement;
+  const plot_4_button = series.querySelector('.plot-4-button') as HTMLButtonElement;
+  const plot_other = series.querySelector('.plot-other') as HTMLInputElement;
+
+  const buttonOn = (button: HTMLButtonElement) => {
+    button.style.color = "black";
+    button.style.fontWeight = "bold";
+  }
+
+  const buttonOff = (button: HTMLButtonElement) => {
+    button.style.color = "grey";
+    button.style.fontWeight = "normal";
+  }
+
+  const otherOn = () => {
+    plot_other.style.color = "black";
+    plot_other.style.fontWeight = "bold";
+  }
+
+  const otherOff = () => {
+    plot_other.style.color = "grey";
+    plot_other.style.fontWeight = "normal";
+  }
+
+  const setPlot = (plot: number) => {
+    buttonOff(plot_1_button);
+    buttonOff(plot_2_button);
+    buttonOff(plot_3_button);
+    buttonOff(plot_4_button);
+    otherOff();
+
+    series.setAttribute('plot', plot.toString());
+
+    if (plot == 1) {
+      buttonOn(plot_1_button);
+    } else if (plot == 2) {
+      buttonOn(plot_2_button);
+    } else if (plot == 3) {
+      buttonOn(plot_3_button);
+    } else if (plot == 4) {
+      buttonOn(plot_4_button);
+    } else {
+      otherOn();
+    }
+
+    updateAxes();
+  }
+
+  plot_1_button.addEventListener('click', () => {
+    setPlot(1);
+  })
+
+  plot_2_button.addEventListener('click', () => {
+    setPlot(2);
+  })
+
+  plot_3_button.addEventListener('click', () => {
+    setPlot(3);
+  })
+
+  plot_4_button.addEventListener('click', () => {
+    setPlot(4);
+  })
+
+  const other_event = () => {
+    setPlot(parseInt(plot_other.value));
+  }
+
+  plot_other.addEventListener('click', other_event);
+  plot_other.addEventListener('change', other_event);
 
   series.querySelector('.remove-series-button')
     .addEventListener('click', () => {
@@ -100,7 +169,8 @@ const addSeries = () => {
 
     setDefaultCheckbox('.line-checkbox');
     setDefaultCheckbox('.scatter-checkbox');
-    setDefaultCheckbox('.subplot-checkbox');
+
+    setPlot(parseInt(defaultSeries.getAttribute('plot')));
 
     const setDefaultValue = (selector: string) => {
       const input: HTMLInputElement = series.querySelector(selector);
@@ -339,26 +409,25 @@ const updateMarkers = (series: HTMLElement) => {
 };
 
 const updateAxes = () => {
+  const plots: Array<number> = [];
+
+  for (const series of document.querySelectorAll('.series') as NodeListOf<HTMLElement>) {
+    const index = parseInt(series.getAttribute('index'));
+    const plot = parseInt(series.getAttribute('plot'));
+    plots.push(plot);
+    Plotly.restyle('plot', { yaxis: 'y' + plot }, index);
+  }
+
   let layout: Partial<Plotly.Layout> = {
     grid: {
-        rows: 1,
+        rows: Math.max(...plots),
         columns: 1,
     }
   }
 
-  for (const series of document.querySelectorAll('.series') as NodeListOf<HTMLElement>) {
-    const index = parseInt(series.getAttribute('index'));
-    const subplot = (series.querySelector('.subplot-checkbox') as HTMLInputElement).checked;
-
-    let yaxis = 'y';
-    if (subplot) {
-      layout.grid.rows += 1;
-      yaxis += layout.grid.rows;
-      // @ts-ignore
-      layout['yaxis' + layout.grid.rows] = { title: '', automargin: true };
-    }
-
-    Plotly.restyle('plot', { yaxis: yaxis }, index);
+  for (const plot of plots) {
+    // @ts-ignore
+    layout['yaxis' + plot] = { title: '', automargin: true };
   }
 
   Plotly.relayout('plot', layout);
@@ -430,8 +499,12 @@ const advanced = document.querySelector('#advanced-checkbox') as HTMLInputElemen
 
 const updateAdvanced = () => {
   const checked = advanced.checked;
-  for (const option of document.querySelectorAll('.advanced-series-option') as NodeListOf<HTMLElement>) {
-    option.hidden = !checked;
+  for (const options of document.querySelectorAll('.advanced-series-options') as NodeListOf<HTMLElement>) {
+    if (checked) {
+     options.style.display = 'block';
+    } else {
+     options.style.display = 'none';
+    }
   }
 }
 
