@@ -92,7 +92,7 @@
 
     <template id="series-template">
       <div class="series">
-
+        <button class="remove-series-button">Remove</button>
         <div class="series-selects">
           <span>File</span>
           <label>
@@ -111,9 +111,24 @@
             Y
             <select class="trace-update y-select"></select>
           </label>
-        </div>
 
-        <div class="series-options">
+          <span>Plot</span>
+          <div class="plot-select">
+            <button class="plot-1-button">1</button>
+            <button class="plot-2-button">2</button>
+            <button class="plot-3-button">3</button>
+            <button class="plot-4-button">4</button>
+            <input
+              type="number"
+              value="5"
+              min="1"
+              step="1"
+              class="plot-other"
+              name="plot"
+              ></input>
+          </div>
+
+          <span></span>
           <div>
             <label>
               <input type="checkbox" class="marker-checkbox line-checkbox" checked/>
@@ -125,23 +140,10 @@
               Scatter
             </label>
           </div>
+        </div>
 
-          <div>
-            <label>
-              <input type="checkbox" class="subplot-checkbox"/>
-              Subplot
-            </label>
-            <button class="remove-series-button">Remove</button>
-          </div>
-
-          <div class="advanced-series-option" hidden>
-            <label>
-              <input type="checkbox" class="default-series-checkbox"/>
-              Default Series
-            </label>
-          </div>
-
-          <div class="advanced-series-option transform-series-options" hidden>
+        <div class="advanced-series-options">
+          <div class="transform-series-options">
             <div>
               <span></span>
               <span>Scale</span>
@@ -188,8 +190,12 @@
               </label>
             </div>
           </div>
-        </div>
 
+          <label>
+            <input type="checkbox" class="default-series-checkbox"/>
+            Default Series
+          </label>
+        </div>
       </div>
     </template>
 

@@ -52,7 +52,7 @@ input {
 }
 
 #file-input {
- margin-left: 0;
+ margin-left: 0px;
 }
 
 .series-box {
@@ -85,6 +85,17 @@ input {
 
 .series-selects > label {
   font-size: 0;
+  padding-bottom: 5px;
+}
+
+.plot-select > button {
+  margin: 0;
+  width: 25px;
+}
+
+.plot-other {
+  width: 20px;
+  text-align: center;
 }
 
 select {
@@ -93,17 +104,17 @@ select {
   width: 100%;
 }
 
-.scatter-checkbox,
-.remove-series-button {
-  margin-left: 15px;
+.scatter-checkbox {
+  margin: 15px 0 0 10px;
 }
 
 .series-selects > span {
-  margin-bottom: 10px;
+  margin: 5px 0;
 }
 
-.series-options > div {
-  margin-top: 5px;
+.advanced-series-options {
+  margin-top: 10px;
+  /*display: none;*/
 }
 
 .transform-series-options > div {
@@ -111,10 +122,6 @@ select {
   grid-template-columns: 0 100px 100px;
   gap: 20px;
   margin-bottom: 5px;
-}
-
-.transform-series-options div:last-child {
-  margin-bottom: 0;
 }
 
 .transform-series-options > div > label {
@@ -135,4 +142,8 @@ input::-webkit-inner-spin-button {
 input[type="number"] {
   appearance: inherit;
   -moz-appearance: textfield;
+}
+
+.default-series-checkbox {
+  margin-top: 15px;
 }
