@@ -8,17 +8,17 @@ type CSV = Papa.ParseResult<CSVRow>;
 
 const dfs: { [key: string]: CSV } = {};
 
-let seriesCounter = 0;
-let defaultSeries: HTMLElement = null;
+let series_counter = 0;
+let default_series: HTMLElement = null;
 
-let firstFile = true;
-let firstTrace = true;
+let first_file = true;
+let first_trace = true;
 
-const fileInstruction = 'Add CSV files by dragging and dropping anywhere.';
-const traceInstruction = 'Select a file, x column and y column to plot a series.';
+const file_instruction = 'Add CSV files by dragging and dropping anywhere.';
+const trace_instruction = 'Select a file, x column and y column to plot a series.';
 
 const default_layout: Partial<Plotly.Layout> = {
-  title: fileInstruction,
+  title: file_instruction,
   xaxis: { title: '', automargin: true, },
   yaxis: { title: '', automargin: true, },
 };
@@ -42,8 +42,8 @@ const addSeries = () => {
   const seriesNode = template.content.cloneNode(true);
   const series = (seriesNode as HTMLElement).querySelector('div');
 
-  series.setAttribute('index', (seriesCounter++).toString());
-  series.setAttribute('plot', '1');
+  series.setAttribute('index', (series_counter++).toString());
+  series.setAttribute('plot_num', '1');
 
   series.querySelector('.file-select')
    .addEventListener('change', () => {
@@ -96,7 +96,7 @@ const addSeries = () => {
     buttonOff(plot_4_button);
     otherOff();
 
-    series.setAttribute('plot', plot.toString());
+    series.setAttribute('plot_num', plot.toString());
 
     if (plot == 1) {
       buttonOn(plot_1_button);
@@ -130,7 +130,9 @@ const addSeries = () => {
   })
 
   const other_event = () => {
-    setPlot(parseInt(plot_other.value));
+    const plot_num = intMin1(parseInt(plot_other.value));
+    plot_other.value = plot_num.toString();
+    setPlot(plot_num);
   }
 
   plot_other.addEventListener('click', other_event);
@@ -150,10 +152,10 @@ const addSeries = () => {
   document.querySelector('.series-box').appendChild(seriesNode);
   Plotly.addTraces('plot', default_trace);
 
-  if (defaultSeries != null) {
+  if (default_series != null) {
     const setDefaultSelect = (selector: string) => {
       const select: HTMLSelectElement = series.querySelector(selector);
-      const defaultSelect: HTMLSelectElement = defaultSeries.querySelector(selector);
+      const defaultSelect: HTMLSelectElement = default_series.querySelector(selector);
       select.value = defaultSelect.value;
     }
 
@@ -163,18 +165,19 @@ const addSeries = () => {
 
     const setDefaultCheckbox = (selector: string) => {
       const checkbox: HTMLInputElement = series.querySelector(selector);
-      const defaultCheckbox: HTMLInputElement = defaultSeries.querySelector(selector);
+      const defaultCheckbox: HTMLInputElement = default_series.querySelector(selector);
       checkbox.checked = defaultCheckbox.checked;
     }
 
     setDefaultCheckbox('.line-checkbox');
     setDefaultCheckbox('.scatter-checkbox');
+    setDefaultCheckbox('.zero-x-checkbox');
 
-    setPlot(parseInt(defaultSeries.getAttribute('plot')));
+    setPlot(parseInt(default_series.getAttribute('plot_num')));
 
     const setDefaultValue = (selector: string) => {
       const input: HTMLInputElement = series.querySelector(selector);
-      const defaultInput: HTMLInputElement = defaultSeries.querySelector(selector);
+      const defaultInput: HTMLInputElement = default_series.querySelector(selector);
       input.value = defaultInput.value;
     }
 
@@ -182,6 +185,7 @@ const addSeries = () => {
     setDefaultValue('.x-transform-offset');
     setDefaultValue('.y-transform-scale');
     setDefaultValue('.y-transform-offset');
+    setDefaultValue('.downsample');
 
     updateColumns(series);
     updateTrace(series);
@@ -194,20 +198,20 @@ const addSeries = () => {
 const updateDefault = (series: HTMLElement) => {
   const checkbox = series.querySelector('.default-series-checkbox') as HTMLInputElement;
   if (checkbox.checked) {
-    defaultSeries = series;
+    default_series = series;
     for (const otherCheckbox of document.querySelectorAll('.default-series-checkbox') as NodeListOf<HTMLInputElement>) {
       if (otherCheckbox != checkbox) {
         otherCheckbox.checked = false;
       }
     }
-  } else if (defaultSeries == series) {
-    defaultSeries = null;
+  } else if (default_series == series) {
+    default_series = null;
   }
 }
 
 const removeSeries = (series: HTMLElement) => {
-  if (seriesCounter > 0) {
-    seriesCounter--;
+  if (series_counter > 0) {
+    series_counter--;
 
     const index = parseInt(series.getAttribute('index'));
     series.remove();
@@ -236,13 +240,13 @@ Plotly.newPlot('plot', [], default_layout, default_plot_options)
   .then((plot) => {
     plot.on('plotly_relayout', (event: any) => {
       if (
-        (firstFile || firstTrace) &&
+        (first_file || first_trace) &&
         'title.text' in event &&
-        event['title.text'] !== fileInstruction &&
-        event['title.text'] !== traceInstruction
+        event['title.text'] !== file_instruction &&
+        event['title.text'] !== trace_instruction
       ) {
-        firstFile = false;
-        firstTrace = false;
+        first_file = false;
+        first_trace = false;
       }
     });
 
@@ -320,8 +324,8 @@ const updateColumns = (series: HTMLElement) => {
   }
 };
 
-const transformData = (data: number[], scale: number, offset: number) => {
-  if (isNaN(scale) && isNaN(offset)) {
+const transformData = (data: number[], scale: number, offset: number, zero: boolean) => {
+  if (isNaN(scale) && isNaN(offset) && !zero) {
     return data;
   }
 
@@ -333,7 +337,18 @@ const transformData = (data: number[], scale: number, offset: number) => {
     offset = 0;
   }
 
+  if (zero && data.length > 0) {
+    offset -= data[0] * scale;
+  }
+
   return data.map((datum: number) => datum * scale + offset);
+}
+
+const intMin1 = (val: number) => {
+    if (isNaN(val) || val < 1) {
+      val = 1;
+    }
+    return val;
 }
 
 const updateTrace = (series: HTMLElement, update_axes: boolean = true) => {
@@ -342,16 +357,20 @@ const updateTrace = (series: HTMLElement, update_axes: boolean = true) => {
   const y_label = (series.querySelector('.y-select') as HTMLSelectElement).value;
 
   if (file !== '' && x_label !== '' && y_label !== '') {
-    if (firstTrace) {
+    if (first_trace) {
       Plotly.relayout('plot', {title: ''});
     }
-    firstTrace = false;
+    first_trace = false;
 
-    const xScale = parseFloat((series.querySelector('.x-transform-scale') as HTMLInputElement).value);
-    const xOffset = parseFloat((series.querySelector('.x-transform-offset') as HTMLInputElement).value);
+    const x_scale = parseFloat((series.querySelector('.x-transform-scale') as HTMLInputElement).value);
+    let x_offset = parseFloat((series.querySelector('.x-transform-offset') as HTMLInputElement).value);
 
-    const yScale = parseFloat((series.querySelector('.y-transform-scale') as HTMLInputElement).value);
-    const yOffset = parseFloat((series.querySelector('.y-transform-offset') as HTMLInputElement).value);
+    const y_scale = parseFloat((series.querySelector('.y-transform-scale') as HTMLInputElement).value);
+    const y_offset = parseFloat((series.querySelector('.y-transform-offset') as HTMLInputElement).value);
+
+    const downsample = series.querySelector('.downsample') as HTMLInputElement;
+    const downsample_factor = intMin1(parseInt(downsample.value));
+    downsample.value = downsample_factor.toString();
 
     const trace_data = dfs[file].data;
 
@@ -365,7 +384,7 @@ const updateTrace = (series: HTMLElement, update_axes: boolean = true) => {
 
     let x_data = [];
     let y_data = [];
-    for (let i = 0; i < trace_data.length; i++) {
+    for (let i = 0; i < trace_data.length; i += downsample_factor) {
       const x = trace_data[i][x_label];
       const y = trace_data[i][y_label];
       if (x !== null && y !== null) {
@@ -374,9 +393,11 @@ const updateTrace = (series: HTMLElement, update_axes: boolean = true) => {
       }
     }
 
+    const zero_x = (series.querySelector('.zero-x-checkbox') as HTMLInputElement).checked;
+
     const trace = {
-      x: [transformData(x_data, xScale, xOffset)],
-      y: [transformData(y_data, yScale, yOffset)],
+      x: [transformData(x_data, x_scale, x_offset, zero_x)],
+      y: [transformData(y_data, y_scale, y_offset, false)],
     }
 
     const index = parseInt(series.getAttribute('index'));
@@ -413,9 +434,9 @@ const updateAxes = () => {
 
   for (const series of document.querySelectorAll('.series') as NodeListOf<HTMLElement>) {
     const index = parseInt(series.getAttribute('index'));
-    const plot = parseInt(series.getAttribute('plot'));
-    plots.push(plot);
-    Plotly.restyle('plot', { yaxis: 'y' + plot }, index);
+    const plot_num = parseInt(series.getAttribute('plot_num'));
+    plots.push(plot_num);
+    Plotly.restyle('plot', { yaxis: 'y' + plot_num }, index);
   }
 
   let layout: Partial<Plotly.Layout> = {
@@ -436,10 +457,10 @@ const updateAxes = () => {
 // file management //
 
 const addFile = (file: File) => {
-  if (firstFile) {
-    Plotly.relayout('plot', {title: traceInstruction})
+  if (first_file) {
+    Plotly.relayout('plot', {title: trace_instruction})
   }
-  firstFile = false;
+  first_file = false;
 
   Papa.parse(file, {
     header: true,

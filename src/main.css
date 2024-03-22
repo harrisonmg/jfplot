@@ -169,6 +169,13 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
-.default-series-checkbox {
+.default-series-checkbox, .zero-x-checkbox {
   margin-top: 15px;
+}
+
+.downsample {
+  width: 50px;
+  text-align: center;
+  margin-top: 10px;
+  margin-left: 10px;
 }
