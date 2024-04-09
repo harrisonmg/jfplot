@@ -43,7 +43,6 @@ const addSeries = () => {
   const series = (seriesNode as HTMLElement).querySelector('div');
 
   series.setAttribute('index', (series_counter++).toString());
-  series.setAttribute('plot_num', '1');
 
   series.querySelector('.file-select')
    .addEventListener('change', () => {
@@ -111,6 +110,16 @@ const addSeries = () => {
     }
 
     updateAxes();
+  }
+
+  const plots: Array<number> = [];
+  for (const series of document.querySelectorAll('.series') as NodeListOf<HTMLElement>) {
+    plots.push(parseInt(series.getAttribute('plot_num')));
+  }
+  const plot_num = plots.length == 0 ? 1 : Math.max(...plots) + 1;
+  setPlot(plot_num);
+  if (plot_num > 5) {
+    plot_other.value = plot_num.toString();
   }
 
   plot_1_button.addEventListener('click', () => {
@@ -192,6 +201,7 @@ const addSeries = () => {
     updateMarkers(series);
   }
 
+  updateAxes();
   updateAdvanced();
 };
 
@@ -356,56 +366,58 @@ const updateTrace = (series: HTMLElement, update_axes: boolean = true) => {
   const x_label = (series.querySelector('.x-select') as HTMLSelectElement).value;
   const y_label = (series.querySelector('.y-select') as HTMLSelectElement).value;
 
-  if (file !== '' && x_label !== '' && y_label !== '') {
-    if (first_trace) {
-      Plotly.relayout('plot', {title: ''});
+  if (file == '' && x_label == '' && y_label == '') {
+    return;
+  }
+
+  if (first_trace) {
+    Plotly.relayout('plot', {title: ''});
+  }
+  first_trace = false;
+
+  const x_scale = parseFloat((series.querySelector('.x-transform-scale') as HTMLInputElement).value);
+  let x_offset = parseFloat((series.querySelector('.x-transform-offset') as HTMLInputElement).value);
+
+  const y_scale = parseFloat((series.querySelector('.y-transform-scale') as HTMLInputElement).value);
+  const y_offset = parseFloat((series.querySelector('.y-transform-offset') as HTMLInputElement).value);
+
+  const downsample = series.querySelector('.downsample') as HTMLInputElement;
+  const downsample_factor = intMin1(parseInt(downsample.value));
+  downsample.value = downsample_factor.toString();
+
+  const trace_data = dfs[file].data;
+
+  trace_data.sort((a, b) => {
+    const ax = a[x_label];
+    const bx = b[x_label];
+     return ax < bx ? -1 :
+            ax > bx ? 1 :
+            0;
+  })
+
+  let x_data = [];
+  let y_data = [];
+  for (let i = 0; i < trace_data.length; i += downsample_factor) {
+    const x = trace_data[i][x_label];
+    const y = trace_data[i][y_label];
+    if (x !== null && y !== null) {
+      x_data.push(x);
+      y_data.push(y);
     }
-    first_trace = false;
+  }
 
-    const x_scale = parseFloat((series.querySelector('.x-transform-scale') as HTMLInputElement).value);
-    let x_offset = parseFloat((series.querySelector('.x-transform-offset') as HTMLInputElement).value);
+  const zero_x = (series.querySelector('.zero-x-checkbox') as HTMLInputElement).checked;
 
-    const y_scale = parseFloat((series.querySelector('.y-transform-scale') as HTMLInputElement).value);
-    const y_offset = parseFloat((series.querySelector('.y-transform-offset') as HTMLInputElement).value);
+  const trace = {
+    x: [transformData(x_data, x_scale, x_offset, zero_x)],
+    y: [transformData(y_data, y_scale, y_offset, false)],
+  }
 
-    const downsample = series.querySelector('.downsample') as HTMLInputElement;
-    const downsample_factor = intMin1(parseInt(downsample.value));
-    downsample.value = downsample_factor.toString();
+  const index = parseInt(series.getAttribute('index'));
+  Plotly.restyle('plot', trace, index);
 
-    const trace_data = dfs[file].data;
-
-    trace_data.sort((a, b) => {
-      const ax = a[x_label];
-      const bx = b[x_label];
-       return ax < bx ? -1 :
-              ax > bx ? 1 :
-              0;
-    })
-
-    let x_data = [];
-    let y_data = [];
-    for (let i = 0; i < trace_data.length; i += downsample_factor) {
-      const x = trace_data[i][x_label];
-      const y = trace_data[i][y_label];
-      if (x !== null && y !== null) {
-        x_data.push(x);
-        y_data.push(y);
-      }
-    }
-
-    const zero_x = (series.querySelector('.zero-x-checkbox') as HTMLInputElement).checked;
-
-    const trace = {
-      x: [transformData(x_data, x_scale, x_offset, zero_x)],
-      y: [transformData(y_data, y_scale, y_offset, false)],
-    }
-
-    const index = parseInt(series.getAttribute('index'));
-    Plotly.restyle('plot', trace, index);
-
-    if (update_axes) {
-      updateAxes();
-    }
+  if (update_axes) {
+    updateAxes();
   }
 };
 
