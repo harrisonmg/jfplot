@@ -34,7 +34,7 @@ const default_plot_options: Partial<Plotly.Config> = {
 
 const default_trace: Partial<Plotly.PlotData> = {
      mode: 'lines',
-     type: 'scatter',
+     type: 'scattergl',
 };
 
 // series management //
@@ -546,23 +546,6 @@ const updateAdvanced = () => {
 }
 
 advanced.addEventListener('click', updateAdvanced);
-
-// big data (WebGL) //
-
-const big_data = document.querySelector('#big-data-checkbox') as HTMLInputElement;
-
-const updateBigData = () => {
-  const checked = big_data.checked;
-  const new_type = checked ? "scattergl" : "scatter";
-  default_trace.type = new_type;
-  for (const series of document.querySelectorAll('.series') as NodeListOf<HTMLElement>) {
-    const index = parseInt(series.getAttribute('index'));
-    Plotly.restyle('plot', { type: new_type }, index);
-  }
-}
-
-big_data.addEventListener('click', updateBigData);
-updateBigData();
 
 // help modal //
 
