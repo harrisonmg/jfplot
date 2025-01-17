@@ -18,9 +18,11 @@ const file_instruction = 'Add CSV files by dragging and dropping anywhere.';
 const trace_instruction = 'Select a file, x column and y column to plot a series.';
 
 const default_layout: Partial<Plotly.Layout> = {
-  title: file_instruction,
+  // @ts-ignore
+  title: { text: file_instruction, subtitle: { text: '' } },
   xaxis: { title: '', automargin: true, },
   yaxis: { title: '', automargin: true, },
+  hovermode: 'x',
 };
 
 const default_plot_options: Partial<Plotly.Config> = {
@@ -371,7 +373,8 @@ const updateTrace = (series: HTMLElement, update_axes: boolean = true) => {
   }
 
   if (first_trace) {
-    Plotly.relayout('plot', {title: ''});
+    // @ts-ignore
+    Plotly.relayout('plot', {title: {text: '', subtitle: { text: '' }}});
   }
   first_trace = false;
 
@@ -470,7 +473,8 @@ const updateAxes = () => {
 
 const addFile = (file: File) => {
   if (first_file) {
-    Plotly.relayout('plot', {title: trace_instruction})
+    // @ts-ignore
+    Plotly.relayout('plot', {title: {text: trace_instruction, subtitle: { text: '' }}});
   }
   first_file = false;
 
