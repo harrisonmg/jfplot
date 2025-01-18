@@ -24,6 +24,7 @@ const default_layout: Partial<Plotly.Layout> = {
   xaxis: { title: '', automargin: true, },
   yaxis: { title: '', automargin: true, },
   hovermode: 'x',
+  hoversubplots: 'axis',
 };
 
 const default_plot_options: Partial<Plotly.Config> = {
