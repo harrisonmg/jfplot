@@ -10,6 +10,7 @@ const dfs: { [key: string]: CSV } = {};
 
 let series_counter = 0;
 let default_series: HTMLElement = null;
+let max_plots = 1;
 
 let first_file = true;
 let first_trace = true;
@@ -97,6 +98,7 @@ const addSeries = () => {
     buttonOff(plot_4_button);
     otherOff();
 
+    series.setAttribute('prev_plot_num', '0');
     series.setAttribute('plot_num', plot.toString());
 
     if (plot == 1) {
@@ -110,8 +112,6 @@ const addSeries = () => {
     } else {
       otherOn();
     }
-
-    updateAxes();
   }
 
   const plots: Array<number> = [];
@@ -126,24 +126,29 @@ const addSeries = () => {
 
   plot_1_button.addEventListener('click', () => {
     setPlot(1);
+    updateAxes();
   })
 
   plot_2_button.addEventListener('click', () => {
     setPlot(2);
+    updateAxes();
   })
 
   plot_3_button.addEventListener('click', () => {
     setPlot(3);
+    updateAxes();
   })
 
   plot_4_button.addEventListener('click', () => {
     setPlot(4);
+    updateAxes();
   })
 
   const other_event = () => {
     const plot_num = intMin1(parseInt(plot_other.value));
     plot_other.value = plot_num.toString();
     setPlot(plot_num);
+    updateAxes();
   }
 
   plot_other.addEventListener('click', other_event);
@@ -233,7 +238,7 @@ const removeSeries = (series: HTMLElement) => {
       const oldIndex = parseInt(otherSeries.getAttribute('index'));
       if (oldIndex > index) {
         otherSeries.setAttribute('index', (oldIndex - 1).toString());
-        updateTrace(otherSeries, false);
+        updateTrace(otherSeries);
       }
     }
 
@@ -363,7 +368,7 @@ const intMin1 = (val: number) => {
     return val;
 }
 
-const updateTrace = (series: HTMLElement, update_axes: boolean = true) => {
+const updateTrace = (series: HTMLElement) => {
   const file = (series.querySelector('.file-select') as HTMLSelectElement).value;
   const x_label = (series.querySelector('.x-select') as HTMLSelectElement).value;
   const y_label = (series.querySelector('.y-select') as HTMLSelectElement).value;
@@ -418,10 +423,6 @@ const updateTrace = (series: HTMLElement, update_axes: boolean = true) => {
 
   const index = parseInt(series.getAttribute('index'));
   Plotly.restyle('plot', trace, index);
-
-  if (update_axes) {
-    updateAxes();
-  }
 };
 
 const updateMarkers = (series: HTMLElement) => {
@@ -449,22 +450,33 @@ const updateAxes = () => {
 
   for (const series of document.querySelectorAll('.series') as NodeListOf<HTMLElement>) {
     const index = parseInt(series.getAttribute('index'));
+    const prev_plot_num = parseInt(series.getAttribute('prev_plot_num'));
     const plot_num = parseInt(series.getAttribute('plot_num'));
     plots.push(plot_num);
-    Plotly.restyle('plot', { yaxis: 'y' + plot_num }, index);
+
+    if (prev_plot_num != plot_num) {
+      Plotly.restyle('plot', { yaxis: 'y' + plot_num }, index);
+      series.setAttribute('prev_plot_num', plot_num.toString());
+    }
   }
+
+  const num_plots = Math.max(1, Math.max(...plots));
 
   let layout: Partial<Plotly.Layout> = {
     grid: {
-        rows: Math.max(...plots),
+        rows: num_plots,
         columns: 1,
     }
   }
 
-  for (const plot of plots) {
+  const new_max_plots = Math.max(max_plots, Math.max(...plots));
+
+  for (let i = max_plots + 1; i <= new_max_plots; i += 1) {
     // @ts-ignore
-    layout['yaxis' + plot] = { title: '', automargin: true };
+    layout['yaxis' + i] = { title: '', automargin: true };
   }
+
+  max_plots = new_max_plots;
 
   Plotly.relayout('plot', layout);
 };
