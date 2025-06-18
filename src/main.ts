@@ -61,7 +61,7 @@ const addSeries = () => {
   }
 
   for (const markerCheckbox of series.querySelectorAll('.marker-checkbox')) {
-   markerCheckbox.addEventListener('click', () => {
+   markerCheckbox.addEventListener('change', () => {
      updateMarkers(series);
    });
   }
@@ -491,7 +491,7 @@ const addFile = (file: File) => {
   }
   first_file = false;
 
-  Papa.parse(file, {
+  return new Promise((resolve, reject) => Papa.parse(file, {
     header: true,
     dynamicTyping: true,
     skipEmptyLines: 'greedy',
@@ -517,8 +517,10 @@ const addFile = (file: File) => {
           }
         }
       }
+      resolve(null);
     },
-  });
+    error: err => reject(err),
+  }));
 };
 
 document.querySelector('#file-input')
@@ -577,3 +579,47 @@ window.addEventListener('click', (event: MouseEvent) => {
     helpModal.style.display = 'none';
   }
 });
+
+// demo //
+
+const loadDemo = () => {
+    helpModal.style.display = 'none';
+    fetch('/demo.csv')
+    .then((res) => res.blob())
+    .then((blob) => addFile(new File([blob], 'demo.csv', { type: blob.type })))
+    .then(() => {
+        var series = document.querySelector<HTMLDivElement>('div.series[index="0"]');
+        var select = series.querySelector<HTMLSelectElement>('select.y-select');
+        select.value = "motor_speed";
+        select.dispatchEvent(new Event('change'));
+
+        addSeries();
+        series = document.querySelector<HTMLDivElement>('div.series[index="1"]');
+        const plot_1 = series.querySelector<HTMLButtonElement>('button.plot-1-button');
+        plot_1.click()
+
+        select = series.querySelector<HTMLSelectElement>('select.y-select');
+        select.value = "wheel_speed";
+        select.dispatchEvent(new Event('change'));
+
+        addSeries();
+        series = document.querySelector<HTMLDivElement>('div.series[index="2"]');
+        const scatter = series.querySelector<HTMLInputElement>('input[type="checkbox"].scatter-checkbox');
+        scatter.checked = true;
+        scatter.dispatchEvent(new Event('change'));
+
+        select = series.querySelector<HTMLSelectElement>('select.y-select');
+        select.value = "event";
+        select.dispatchEvent(new Event('change'));
+    });
+}
+
+const checkHash = () => {
+  if (window.location.hash === "#demo") {
+    loadDemo();
+  }
+}
+
+checkHash();
+
+window.addEventListener("hashchange", checkHash);

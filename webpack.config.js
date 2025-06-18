@@ -36,7 +36,8 @@ module.exports = {
         { from: 'src/main.css' },
         { from: 'src/series_colors.css' },
         { from: 'src/loading.css' },
-        { from: 'src/modal.css' }
+        { from: 'src/modal.css' },
+        { from: 'demo.csv' }
       ]
     })
   ]
